@@ -22,8 +22,7 @@ body {
   background-origin: border-box;
   font-size: 32pt;
   font-family: sans-serif;
-  transition: transform 0.5s ease-in, color 0.5s ease-in,
-    text-decoration 0.5s ease-in;
+  transition: all 0.2s ease-in;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -35,11 +34,10 @@ body {
 }
 
 .moveable:hover {
-  color: red;
+  color: #006600;
   text-decoration: underline;
   border: 2px solid red;
   cursor: pointer;
-  text-decoration: none;
 }
 
 .hidden {
