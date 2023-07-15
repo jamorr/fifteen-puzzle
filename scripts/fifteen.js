@@ -36,6 +36,7 @@ class Board {
         this.board_wrapper.appendChild(tile_el);
       }
     }
+    this.board_wrapper.lastChild.remove();
   }
 
   // shuffle board before play begins
@@ -53,9 +54,12 @@ class GameLogic {
     this.size = 4;
     this.image = "./assets/real_toad.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);
+    this.addClickHandle();
   }
   addClickHandle() {
-    this.board_wrapper.addEventListener("click", this.clickHandler);
+    this.board_wrapper.addEventListener("click", (event) =>
+      this.clickHandler(event)
+    );
   }
 
   removeClickHandle() {
@@ -70,7 +74,11 @@ class GameLogic {
     if (element === null) {
       return;
     }
-    this.movePiece(element);
+    console.log(element);
+
+    if (element.classList.contains("movable")) {
+      this.movePiece(element);
+    }
   }
   // new game
   initGame() {}

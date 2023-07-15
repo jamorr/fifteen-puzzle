@@ -5,6 +5,7 @@
   grid-auto-rows: 100px;
 }
 .tile {
+  box-sizing: border-box;
   width: 100px;
   height: 100px;
   border: 2px solid black;
@@ -12,4 +13,10 @@
   font-family: sans-serif;
   transition: transform 0.5s ease-in, color 0.5s ease-in,
     text-decoration 0.5s ease-in;
+}
+
+.moveable :hover {
+  color: #006600;
+  text-decoration: underline;
+  border-color: red;
 }
