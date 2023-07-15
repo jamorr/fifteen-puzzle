@@ -28,6 +28,8 @@ class Board {
   constructor(size, image, board_wrapper) {
     this.board_wrapper = board_wrapper;
     this.board = Array.from(Array(size), () => Array(size));
+    this.size = size;
+    this.image = image;
     for (let i = 0; i < size; i++) {
       for (let j = 0; j < size; j++) {
         const tile_el = document.createElement("div", { is: "tile-w" });
@@ -36,10 +38,57 @@ class Board {
         this.board_wrapper.appendChild(tile_el);
       }
     }
-    this.board_wrapper.lastChild.remove();
+
+    this.emptyTile = this.board_wrapper.lastChild;
+    this.emptyTile.classList.add("hidden");
+  }
+  moveTiles(tile) {
+    const t_row = parseInt(tile.style.gridRow);
+    const t_col = parseInt(tile.style.gridColumn);
+    const e_row = parseInt(this.emptyTile.style.gridRow);
+    const e_col = parseInt(this.emptyTile.style.gridColumn);
+    if (t_row === e_row) {
+      this.moveEmptyH(t_col - 1, e_row - 1, e_col - 1);
+      this.updateBoardRow(e_row - 1);
+    } else if (t_col === e_col) {
+      this.moveEmptyV(t_row - 1, e_row - 1, e_col - 1);
+      this.updateBoardCol(e_col - 1);
+    }
   }
 
-  // shuffle board before play begins
+  moveEmptyH(num, row, col) {
+    const r = row;
+    let c = col;
+    const direction = num < col ? -1 : 1;
+    for (; c !== num; c += direction) {
+      const temp = this.board[r][c];
+      this.board[r][c] = this.board[r][c + direction];
+      this.board[r][c + direction] = temp;
+    }
+  }
+  moveEmptyV(num, row, col) {
+    let r = row;
+    const c = col;
+    const direction = num < row ? -1 : 1;
+    for (; r !== num; r += direction) {
+      const temp = this.board[r][c];
+      this.board[r][c] = this.board[r + direction][c];
+      this.board[r + direction][c] = temp;
+    }
+  }
+  updateBoardRow(row) {
+    const row_up = this.board[row];
+    for (let i = 0; i < this.size; i++) {
+      row_up[i].style.gridColumn = i + 1;
+    }
+  }
+  updateBoardCol(col) {
+    for (let i = 0; i < this.size; i++) {
+      this.board[i][col].style.gridRow = i + 1;
+    }
+  }
+  updateEntireBoard() {}
+  //shuffle board before play begins
   shuffle() {}
   // solve the board for the player
   solve() {}
@@ -63,7 +112,9 @@ class GameLogic {
   }
 
   removeClickHandle() {
-    this.board_wrapper.removeEventListener("click", this.clickHandler);
+    this.board_wrapper.removeEventListener("click", (event) =>
+      this.clickHandler(event)
+    );
   }
 
   // handles player click on board
@@ -74,24 +125,14 @@ class GameLogic {
     if (element === null) {
       return;
     }
-    console.log(element);
 
-    if (element.classList.contains("movable")) {
-      this.movePiece(element);
-    }
+    this.game.moveTiles(element);
   }
   // new game
   initGame() {}
 
   // end game
   endGame() {}
-
-  // make move
-  movePiece(tile) {
-    if (tile.row === this.game.emptyRow || tile.col === this.game.emptyCol) {
-      console.log("clicked movable");
-    }
-  }
 }
 
 var game_session = new GameLogic();

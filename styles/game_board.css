@@ -20,3 +20,7 @@
   text-decoration: underline;
   border-color: red;
 }
+
+.hidden {
+  visibility: hidden;
+}
