@@ -5,8 +5,10 @@ class Tile extends HTMLDivElement {
     this.col = col;
 
     this.style.background = `url(${image})`;
-    const x_off = Math.floor((1 / size) * col * 100);
-    const y_off = Math.floor((1 / size) * row * 100);
+    const x_off = (1 / size) * col * 100;
+    const y_off = (1 / size) * row * 100;
+    const bg_factor = size * 100;
+    this.style.backgroundSize = `${bg_factor}px ${bg_factor}px`;
     this.style.backgroundPosition = `${x_off}% ${y_off}%`;
     this.style.gridRow = row + 1;
     this.style.gridColumn = col + 1;
@@ -136,7 +138,8 @@ class GameLogic {
   constructor() {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
-    this.size = 8;
+    this.size = 10;
+    // this.image = "./assets/bombo.jpg";
     this.image = "./assets/real_toad.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);
     this.click_handled = false;
