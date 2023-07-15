@@ -61,9 +61,10 @@ class Board {
 
     const direction = num < col ? -1 : 1;
     for (let c = col; c !== num; c += direction) {
-      const temp = this.board[r][c];
-      this.board[r][c] = this.board[r][c + direction];
-      this.board[r][c + direction] = temp;
+      [this.board[r][c], this.board[r][c + direction]] = [
+        this.board[r][c + direction],
+        this.board[r][c],
+      ];
     }
   }
   // Move empty tile vertically
@@ -71,9 +72,10 @@ class Board {
     const c = col;
     const direction = num < row ? -1 : 1;
     for (let r = row; r !== num; r += direction) {
-      const temp = this.board[r][c];
-      this.board[r][c] = this.board[r + direction][c];
-      this.board[r + direction][c] = temp;
+      [this.board[r][c], this.board[r + direction][c]] = [
+        this.board[r + direction][c],
+        this.board[r][c],
+      ];
     }
   }
   // Update tile location in grid row
@@ -137,12 +139,14 @@ class GameLogic {
     this.size = 4;
     this.image = "./assets/real_toad.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);
+    this.click_handled = false;
   }
 
   addClickHandle() {
     this.board_wrapper.addEventListener("click", (event) =>
       this.clickHandler(event)
     );
+    this.click_handled = true;
   }
 
   removeClickHandle() {
@@ -164,8 +168,11 @@ class GameLogic {
 
   // new game
   initGame() {
+    if (!this.click_handled) {
+      this.addClickHandle();
+      this.click_handled = true;
+    }
     this.game.shuffle();
-    this.addClickHandle();
   }
 
   // end game
