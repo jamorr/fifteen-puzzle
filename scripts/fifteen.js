@@ -9,6 +9,10 @@ class Tile extends HTMLDivElement {
     const y_off = (1 / size) * row * 100;
     const bg_factor = size * 100;
     this.style.backgroundSize = `${bg_factor}px ${bg_factor}px`;
+
+    // this.style.backgroundSize = "cover";
+    // this.style.backgroundOrigin = "border-box";
+    // this.style.backgroundRepeat = "no-repeat";
     this.style.backgroundPosition = `${x_off}% ${y_off}%`;
     this.style.gridRow = row + 1;
     this.style.gridColumn = col + 1;
@@ -22,6 +26,14 @@ class Tile extends HTMLDivElement {
 }
 customElements.define("tile-w", Tile, { extends: "div" });
 
+function createTestTile(size, image) {
+  const test_tile = document.createElement("div", { is: "tile-w" });
+  test_tile.placeNStyle(0, 0, size, image);
+  test_tile.style.width = `${size * 100}px`;
+  test_tile.style.height = `${size * 100}px`;
+  document.body.appendChild(test_tile);
+}
+
 // Dataclass for storing board and core functionality related to it
 class Board {
   // Initialize new board of given size
@@ -30,6 +42,7 @@ class Board {
     this.board = Array.from(Array(size), () => Array(size)); // matrix holding html elements
     this.size = size; // board side length
     this.image = image; // board bg image
+    createTestTile(size, image);
     for (let i = 0; i < size; i++) {
       for (let j = 0; j < size; j++) {
         const tile_el = document.createElement("div", { is: "tile-w" });
@@ -138,7 +151,7 @@ class GameLogic {
   constructor() {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
-    this.size = 10;
+    this.size = 4;
     // this.image = "./assets/bombo.jpg";
     this.image = "./assets/real_toad.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);
