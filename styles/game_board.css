@@ -30,7 +30,7 @@ body {
 }
 
 .moveable {
-  cursor: hand;
+  cursor: pointer;
 }
 
 .moveable:hover {

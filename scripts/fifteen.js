@@ -59,11 +59,9 @@ class Board {
     if (t_row === e_row) {
       this.moveEmptyH(t_col, e_row, e_col);
       this.updateBoardRow(e_row);
-      this.updateHoverStyles();
     } else if (t_col === e_col) {
       this.moveEmptyV(t_row, e_row, e_col);
       this.updateBoardCol(e_col);
-      this.updateHoverStyles();
     }
   }
 
@@ -154,6 +152,7 @@ class Board {
       }
     }
     this.updateEntireBoard();
+    this.updateHoverStyles();
   }
 
   // solve the board for the player
@@ -196,6 +195,7 @@ class GameLogic {
       return;
     }
     this.game.moveTiles(element);
+    this.game.updateHoverStyles();
   }
 
   // new game
