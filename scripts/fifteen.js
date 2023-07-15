@@ -136,7 +136,7 @@ class GameLogic {
   constructor() {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
-    this.size = 4;
+    this.size = 8;
     this.image = "./assets/real_toad.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);
     this.click_handled = false;
