@@ -1,8 +1,5 @@
 // game tile HTML element constructor
 class Tile extends HTMLDivElement {
-  constructor() {
-    super();
-  }
   placeNStyle(row, col, size, image) {
     this.row = row;
     this.col = col;
@@ -22,14 +19,15 @@ class Tile extends HTMLDivElement {
   }
 }
 customElements.define("tile-w", Tile, { extends: "div" });
-// dataclass for storing board and core functionality related to it
+
+// Dataclass for storing board and core functionality related to it
 class Board {
-  // initialize new board of given size
+  // Initialize new board of given size
   constructor(size, image, board_wrapper) {
-    this.board_wrapper = board_wrapper;
-    this.board = Array.from(Array(size), () => Array(size));
-    this.size = size;
-    this.image = image;
+    this.board_wrapper = board_wrapper; //html div containing grid
+    this.board = Array.from(Array(size), () => Array(size)); // matrix holding html elements
+    this.size = size; // board side length
+    this.image = image; // board bg image
     for (let i = 0; i < size; i++) {
       for (let j = 0; j < size; j++) {
         const tile_el = document.createElement("div", { is: "tile-w" });
@@ -39,46 +37,46 @@ class Board {
       }
     }
 
-    this.emptyTile = this.board_wrapper.lastChild;
+    this.emptyTile = this.board_wrapper.lastChild; // empty tile
     this.emptyTile.classList.add("hidden");
   }
 
-  // move tiles row or column if posssible
+  // Move tiles row or column if posssible
   moveTiles(tile) {
-    const t_row = parseInt(tile.style.gridRow);
-    const t_col = parseInt(tile.style.gridColumn);
-    const e_row = parseInt(this.emptyTile.style.gridRow);
-    const e_col = parseInt(this.emptyTile.style.gridColumn);
+    const t_row = parseInt(tile.style.gridRow) - 1;
+    const t_col = parseInt(tile.style.gridColumn) - 1;
+    const e_row = parseInt(this.emptyTile.style.gridRow) - 1;
+    const e_col = parseInt(this.emptyTile.style.gridColumn) - 1;
     if (t_row === e_row) {
-      this.moveEmptyH(t_col - 1, e_row - 1, e_col - 1);
-      this.updateBoardRow(e_row - 1);
+      this.moveEmptyH(t_col, e_row, e_col);
+      this.updateBoardRow(e_row);
     } else if (t_col === e_col) {
-      this.moveEmptyV(t_row - 1, e_row - 1, e_col - 1);
-      this.updateBoardCol(e_col - 1);
+      this.moveEmptyV(t_row, e_row, e_col);
+      this.updateBoardCol(e_col);
     }
   }
-
+  // Move empty tile horizontally
   moveEmptyH(num, row, col) {
     const r = row;
-    let c = col;
+
     const direction = num < col ? -1 : 1;
-    for (; c !== num; c += direction) {
+    for (let c = col; c !== num; c += direction) {
       const temp = this.board[r][c];
       this.board[r][c] = this.board[r][c + direction];
       this.board[r][c + direction] = temp;
     }
   }
+  // Move empty tile vertically
   moveEmptyV(num, row, col) {
-    let r = row;
     const c = col;
     const direction = num < row ? -1 : 1;
-    for (; r !== num; r += direction) {
+    for (let r = row; r !== num; r += direction) {
       const temp = this.board[r][c];
       this.board[r][c] = this.board[r + direction][c];
       this.board[r + direction][c] = temp;
     }
   }
-  // update tile location in grid row
+  // Update tile location in grid row
   updateBoardRow(row) {
     const row_up = this.board[row];
     for (let i = 0; i < this.size; i++) {
@@ -92,6 +90,8 @@ class Board {
       this.board[i][col].style.gridRow = i + 1;
     }
   }
+
+  // update all tile positions
   updateEntireBoard() {
     for (let i = 0; i < this.size; i++) {
       this.updateBoardCol(i);
@@ -106,7 +106,6 @@ class Board {
       // move to space 1,2,3,...,size-1 of row or column
       // from left to right or top to bottom(dont allow no movement)
       let square = Math.floor(Math.random() * (this.size - 1));
-      console.log(square);
       if (Math.floor(i % 2) === 0) {
         //move vertically
         if (square === e_row) {
@@ -139,6 +138,7 @@ class GameLogic {
     this.image = "./assets/real_toad.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);
   }
+
   addClickHandle() {
     this.board_wrapper.addEventListener("click", (event) =>
       this.clickHandler(event)
@@ -159,9 +159,9 @@ class GameLogic {
     if (element === null) {
       return;
     }
-
     this.game.moveTiles(element);
   }
+
   // new game
   initGame() {
     this.game.shuffle();
@@ -172,4 +172,4 @@ class GameLogic {
   endGame() {}
 }
 
-var game_session = new GameLogic();
+const game_session = new GameLogic();
