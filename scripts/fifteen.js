@@ -11,8 +11,10 @@ class Tile extends HTMLDivElement {
     const x_off = -100 * col;
     const y_off = -100 * row;
     this.style.backgroundPosition = `${x_off}px ${y_off}px`;
-    this.row = row;
-    this.col = col;
+    this.style.gridRow = row;
+    this.style.gridColumn = col;
+
+    // all other styling handled in CSS
   }
 }
 
@@ -38,7 +40,12 @@ class Board {
 // manages starting/ending game
 class GameLogic {
   // initializes all instance variables
-  constructor() {}
+  constructor() {
+    // get from player inputs or set a default
+    this.size = 4;
+    this.image = "./assets/real_toad.png";
+    this.game = new Board(size, image);
+  }
 
   // new game
   initGame() {}
