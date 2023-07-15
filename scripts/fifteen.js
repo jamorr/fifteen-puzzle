@@ -90,12 +90,12 @@ class Board {
   updateBoardCol(col) {
     for (let i = 0; i < this.size; i++) {
       this.board[i][col].style.gridRow = i + 1;
-      this.board[i][col].style.gridColumn = col + 1;
     }
   }
   updateEntireBoard() {
     for (let i = 0; i < this.size; i++) {
       this.updateBoardCol(i);
+      this.updateBoardRow(i);
     }
   }
   //shuffle board before play begins
