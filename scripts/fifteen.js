@@ -42,6 +42,8 @@ class Board {
     this.emptyTile = this.board_wrapper.lastChild;
     this.emptyTile.classList.add("hidden");
   }
+
+  // move tiles row or column if posssible
   moveTiles(tile) {
     const t_row = parseInt(tile.style.gridRow);
     const t_col = parseInt(tile.style.gridColumn);
@@ -76,20 +78,53 @@ class Board {
       this.board[r + direction][c] = temp;
     }
   }
+  // update tile location in grid row
   updateBoardRow(row) {
     const row_up = this.board[row];
     for (let i = 0; i < this.size; i++) {
       row_up[i].style.gridColumn = i + 1;
     }
   }
+
+  // update tile location in grid column
   updateBoardCol(col) {
     for (let i = 0; i < this.size; i++) {
       this.board[i][col].style.gridRow = i + 1;
+      this.board[i][col].style.gridColumn = col + 1;
     }
   }
-  updateEntireBoard() {}
+  updateEntireBoard() {
+    for (let i = 0; i < this.size; i++) {
+      this.updateBoardCol(i);
+    }
+  }
   //shuffle board before play begins
-  shuffle() {}
+  shuffle() {
+    let e_row = parseInt(this.emptyTile.style.gridRow) - 1;
+    let e_col = parseInt(this.emptyTile.style.gridColumn) - 1;
+    for (let i = 0; i < (this.size - 1) * 100; i++) {
+      // move to space 1,2,3,...,size-1 of row or column
+      // from left to right or top to bottom(dont allow no movement)
+      let square = Math.floor(Math.random() * (this.size - 1));
+      console.log(square);
+      if (Math.floor(i % 2) === 0) {
+        //move vertically
+        if (square === e_row) {
+          square++;
+        }
+        this.moveEmptyV(square, e_row, e_col);
+        e_row = square;
+      } else {
+        //move horizontally
+        if (square === e_col) {
+          square++;
+        }
+        this.moveEmptyH(square, e_row, e_col);
+        e_col = square;
+      }
+    }
+    this.updateEntireBoard();
+  }
   // solve the board for the player
   solve() {}
 }
@@ -103,7 +138,6 @@ class GameLogic {
     this.size = 4;
     this.image = "./assets/real_toad.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);
-    this.addClickHandle();
   }
   addClickHandle() {
     this.board_wrapper.addEventListener("click", (event) =>
@@ -129,7 +163,10 @@ class GameLogic {
     this.game.moveTiles(element);
   }
   // new game
-  initGame() {}
+  initGame() {
+    this.game.shuffle();
+    this.addClickHandle();
+  }
 
   // end game
   endGame() {}
