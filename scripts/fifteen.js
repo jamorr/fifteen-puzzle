@@ -16,6 +16,12 @@ class Tile extends HTMLDivElement {
     this.classList.add("tile");
     // all other styling handled in CSS
   }
+  getBoardPos() {
+    const col = parseInt(this.style.gridColumn) - 1;
+    const row = parseInt(this.style.gridRow) - 1;
+    return [row, col];
+  }
+
   render(parentElement) {
     parentElement.appendChild(this);
   }
@@ -47,36 +53,30 @@ class Board {
 
   // Move tiles row or column if posssible
   moveTiles(tile) {
-    const t_row = parseInt(tile.style.gridRow) - 1;
-    const t_col = parseInt(tile.style.gridColumn) - 1;
-    const e_row = parseInt(this.emptyTile.style.gridRow) - 1;
-    const e_col = parseInt(this.emptyTile.style.gridColumn) - 1;
+    const [t_row, t_col] = tile.getBoardPos();
+    const [e_row, e_col] = this.emptyTile.getBoardPos();
+    // update internal board and then update display
     if (t_row === e_row) {
       this.moveEmptyH(t_col, e_row, e_col);
       this.updateBoardRow(e_row);
-
-      this.updateHoverStyles(t_row, t_col);
+      this.updateHoverStyles();
     } else if (t_col === e_col) {
       this.moveEmptyV(t_row, e_row, e_col);
       this.updateBoardCol(e_col);
-      this.updateHoverStyles(t_row, t_col);
+      this.updateHoverStyles();
     }
   }
 
   // Chick if the tile is movable and update hover styles
-  updateHoverStyles(row, col) {
+  // TODO: Make this only update tiles that changed instead of full board
+  // ie. remove moveable from old row or col and add to new row or col
+  updateHoverStyles() {
+    const [e_row, e_col] = this.emptyTile.getBoardPos();
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
         const tile = this.board[i][j];
-        const e_row = parseInt(this.emptyTile.style.gridRow) - 1;
-        const e_col = parseInt(this.emptyTile.style.gridColumn) - 1;
 
-        if (
-          (i === row && Math.abs(j - col) === 1) ||
-          (j === col && Math.abs(i - row) === 1) ||
-          (i === e_row && Math.abs(j - e_col) === 1) ||
-          (j === e_col && Math.abs(i - e_row) === 1)
-        ) {
+        if (i === e_row || j === e_col) {
           tile.classList.add("moveable");
         } else {
           tile.classList.remove("moveable");
@@ -132,8 +132,7 @@ class Board {
   }
   //shuffle board before play begins
   shuffle() {
-    let e_row = parseInt(this.emptyTile.style.gridRow) - 1;
-    let e_col = parseInt(this.emptyTile.style.gridColumn) - 1;
+    let [e_row, e_col] = this.emptyTile.getBoardPos();
     for (let i = 0; i < (this.size - 1) * 100; i++) {
       // move to space 1,2,3,...,size-1 of row or column
       // from left to right or top to bottom(dont allow no movement)
@@ -156,7 +155,6 @@ class Board {
     }
     this.updateEntireBoard();
   }
-
 
   // solve the board for the player
   solve() {}
