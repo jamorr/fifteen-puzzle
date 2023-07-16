@@ -30,7 +30,7 @@ body {
   background-origin: border-box;
   font-size: 32pt;
   font-family: sans-serif;
-  transition: all 0.2s ease-in;
+  transition: all 0.2s ease-in-out;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -1,3 +1,5 @@
+"use strict";
+
 // game tile HTML element constructor
 class Tile extends HTMLDivElement {
   placeNStyle(row, col, size, image) {
@@ -37,12 +39,10 @@ class Tile extends HTMLDivElement {
     const [c_row, c_col] = this.getBoardPos();
     const diff_x = n_col - c_col - 1;
     const diff_y = n_row - c_row - 1;
-    // console.log(`${diff_x * 100}px ${diff_y * 100}px`);
     this.style.translate = `${diff_x * 100}px ${diff_y * 100}px`;
     setTimeout(() => {
       this.updateBoardPos(n_row, n_col);
     }, 100);
-    // this.updateBoardPos(n_row, n_col);
   }
 
   render(parentElement) {
@@ -96,8 +96,14 @@ class Board {
   // Chick if the tile is movable and update hover styles
   // TODO: Make this only update tiles that changed instead of full board
   // ie. remove moveable from old row or col and add to new row or col
-  updateHoverStyles() {
-    const [e_row, e_col] = this.emptyTile;
+  updateHoverStyles(remove = false) {
+    let e_row;
+    let e_col;
+    if (remove === true) {
+      [e_row, e_col] = [-1, -1];
+    } else {
+      [e_row, e_col] = this.emptyTile;
+    }
     for (const [i, j, tile] of this.tileIter()) {
       if (tile === null) {
         continue;
@@ -193,23 +199,24 @@ class GameLogic {
   constructor() {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
-    this.size = 5;
+    this.size = 2;
 
     // this.image = "./assets/bombo.jpg";
     this.image = "./assets/real_toad.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);
-    this.click_handled = false;
+    this.click_handle_ref = false;
   }
 
   addClickHandle() {
-    this.board_wrapper.addEventListener("click", this.clickHandler.bind(this));
-    this.click_handled = true;
+    this.click_handle_ref = (event) => {
+      this.clickHandler(event);
+    };
+    this.board_wrapper.addEventListener("click", this.click_handle_ref);
   }
 
   removeClickHandle() {
-    this.board_wrapper.removeEventListener("click", (event) =>
-      this.clickHandler(event)
-    );
+    this.board_wrapper.removeEventListener("click", this.click_handle_ref);
+    this.click_handle_ref = false;
   }
 
   // handles player click on board
@@ -230,9 +237,8 @@ class GameLogic {
 
   // new game
   initGame() {
-    if (!this.click_handled) {
+    if (!this.click_handler_ref) {
       this.addClickHandle();
-      this.click_handled = true;
     }
     while (this.game.isSolved()) {
       this.game.shuffle();
@@ -242,6 +248,11 @@ class GameLogic {
   endGame() {
     const congratsModal = document.getElementById("modal");
     congratsModal.style.display = "block";
+    congratsModal.addEventListener("click", () => {
+      congratsModal.style.display = "none";
+      this.removeClickHandle();
+      this.game.updateHoverStyles(true);
+    });
 
     const playAgain = document.getElementById("playAgainBtn");
     playAgain.addEventListener("click", () => {
@@ -252,5 +263,5 @@ class GameLogic {
 }
 
 const game_session = new GameLogic();
-game_session.initGame();
+// game_session.initGame();
 // game_session.endGame();
