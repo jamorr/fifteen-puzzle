@@ -177,7 +177,7 @@ class GameLogic {
   constructor() {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
-    this.size = 4;
+    this.size = 12;
 
     // this.image = "./assets/bombo.jpg";
     this.image = "./assets/real_toad.png";
@@ -227,7 +227,11 @@ class GameLogic {
     }
     let prev = 0;
     for (let i = 0; i < this.size; i++) {
-      for (let j = 0; j < this.size; j++) {
+      for (
+        let j = 0;
+        j < this.size && i * this.size + j + 1 < this.size * this.size;
+        j++
+      ) {
         prev++;
         if (prev !== parseInt(this.game.board[i][j].innerText)) {
           return false;
@@ -251,4 +255,4 @@ class GameLogic {
 
 const game_session = new GameLogic();
 game_session.initGame();
-game_session.endGame();
+// game_session.endGame();
