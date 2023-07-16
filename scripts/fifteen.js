@@ -230,7 +230,7 @@ class Board {
   shuffle() {
     let [e_row, e_col] = this.empty_tile;
     for (
-      let i = Math.round(Math.random());
+      let i = Math.round(Math.random() * 4);
       i < Math.pow(this.size, 2) * 10;
       i++
     ) {
