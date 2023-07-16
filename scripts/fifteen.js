@@ -110,7 +110,7 @@ class Board {
       this.board_wrapper.appendChild(tile_el);
     }
 
-    this.emptyTile = [size - 1, size - 1]; // store location of empty tile
+    this.empty_tile = [size - 1, size - 1]; // store location of empty tile
     this.board_wrapper.lastChild.remove();
     this.board[size - 1][size - 1] = null;
   }
@@ -137,7 +137,7 @@ class Board {
    */
   moveTiles(tile) {
     const [t_row, t_col] = tile.getBoardPos();
-    const [e_row, e_col] = this.emptyTile;
+    const [e_row, e_col] = this.empty_tile;
     // update internal board and then update display
     if (t_row === e_row) {
       this.moveEmptyH(t_col, e_row, e_col);
@@ -159,7 +159,7 @@ class Board {
     if (remove === true) {
       [e_row, e_col] = [-1, -1];
     } else {
-      [e_row, e_col] = this.emptyTile;
+      [e_row, e_col] = this.empty_tile;
     }
     for (const [i, j, tile] of this.tileIter()) {
       if (tile === null) {
@@ -186,7 +186,7 @@ class Board {
       this.board[r][c + direction].translateUpdate(r, c);
       this.board[r][c] = this.board[r][c + direction];
       this.board[r][c + direction] = null;
-      this.emptyTile[1] += direction;
+      this.empty_tile[1] += direction;
     }
   }
 
@@ -203,7 +203,7 @@ class Board {
       this.board[r + direction][c].translateUpdate(r, c);
       this.board[r][c] = this.board[r + direction][c];
       this.board[r + direction][c] = null;
-      this.emptyTile[0] += direction;
+      this.empty_tile[0] += direction;
     }
   }
 
@@ -228,7 +228,7 @@ class Board {
    * updates frontend representation
    */
   shuffle() {
-    let [e_row, e_col] = this.emptyTile;
+    let [e_row, e_col] = this.empty_tile;
     for (
       let i = Math.round(Math.random());
       i < Math.pow(this.size, 2) * 10;
@@ -271,7 +271,7 @@ class Board {
       new_board[tile.row][tile.col] = tile;
     }
     new_board[this.size - 1][this.size - 1] = null;
-    this.emptyTile = [this.size - 1, this.size - 1];
+    this.empty_tile = [this.size - 1, this.size - 1];
     this.board = new_board;
   }
 
@@ -309,15 +309,15 @@ class GameLogic {
 
     this.size = 3;
 
-    const randomImgNum = Math.floor(Math.random() * 4);
+    const random_img_num = Math.floor(Math.random() * 4);
 
-    this.image = `./assets/${randomImgNum}.png`;
+    this.image = `./assets/${random_img_num}.png`;
 
     this.game = new Board(this.size, this.image, this.board_wrapper);
     this.click_handle_ref = false;
 
-    this.boardSizeInput = document.getElementById("board_size");
-    this.boardImageInput = document.getElementById("board_img_btn");
+    this.board_size_input = document.getElementById("board_size");
+    this.board_image_input = document.getElementById("board_img_btn");
 
     this.handleBoardImageInput();
     this.handleBoardSizeInput();
@@ -330,17 +330,18 @@ class GameLogic {
    * @memberof Gamelogic
    */
   handleBoardSizeInput() {
-    const boardSizeInput = document.getElementById("board_size");
-    const boardSizeValueElement = document.getElementById("board_size_value");
+    const board_size_input = document.getElementById("board_size");
+    const board_size_value_element =
+      document.getElementById("board_size_value");
 
     document.addEventListener("DOMContentLoaded", () => {
-      boardSizeInput.value = 3;
+      board_size_input.value = 3;
     });
 
-    boardSizeInput.addEventListener("input", () => {
-      const newSize = parseInt(boardSizeInput.value);
-      boardSizeValueElement.textContent = `${newSize}x${newSize}`;
-      this.changeBoardSize(newSize);
+    board_size_input.addEventListener("input", () => {
+      const new_size = parseInt(board_size_input.value);
+      board_size_value_element.textContent = `${new_size}x${new_size}`;
+      this.changeBoardSize(new_size);
     });
   }
 
@@ -350,35 +351,34 @@ class GameLogic {
    * @memberof Gamelogic
    */
   handleBoardImageInput() {
-    const boardImageInput = document.getElementById("board_img_btn");
+    const board_image_input = document.getElementById("board_img_btn");
     let prev = 1;
-    boardImageInput.addEventListener("click", () => {
+    board_image_input.addEventListener("click", () => {
       prev++;
       prev %= 4;
 
       this.changeBoardImage(`./assets/${prev}.png`);
-
     });
   }
 
   /**
    * Changes the image of the board and updates the game accordingly.
-   * @param {string} newImg - The URL or path to the new image for the board.
+   * @param {string} new_img - The URL or path to the new image for the board.
    */
-  changeBoardImage(newImg) {
-    if (this.image !== newImg) {
-      this.game.changeBackgroundImage(newImg);
-      this.image = newImg;
+  changeBoardImage(new_img) {
+    if (this.image !== new_img) {
+      this.game.changeBackgroundImage(new_img);
+      this.image = new_img;
     }
   }
 
   /**
    * Changes the size of the board and updates the game accordingly.
-   * @param {number} newSize - The new size for the board. It represents the number of rows and columns.
+   * @param {number} new_size - The new size for the board. It represents the number of rows and columns.
    */
-  changeBoardSize(newSize) {
-    if (this.size !== newSize) {
-      this.size = newSize;
+  changeBoardSize(new_size) {
+    if (this.size !== new_size) {
+      this.size = new_size;
       this.board_wrapper.innerHTML = "";
       this.game = new Board(this.size, this.image, this.board_wrapper);
     }
@@ -442,10 +442,10 @@ class GameLogic {
   initGame() {
     this.addClickHandle();
     this.invertButtons();
-    this.boardImageInput.disabled = true;
-    this.boardSizeInput.disabled = true;
+    this.board_image_input.disabled = true;
+    this.board_size_input.disabled = true;
 
-    this.boardImageInput.classList.add("after_shuffle");
+    this.board_image_input.classList.add("after_shuffle");
 
     while (this.game.isSolved()) {
       this.game.shuffle();
@@ -456,10 +456,10 @@ class GameLogic {
    * Reset the game board to solved state
    */
   resetGame() {
-    this.boardSizeInput.disabled = false;
-    this.boardImageInput.disabled = false;
-    this.boardImageInput.classList.remove("after_shuffle");
-    this.boardImageInput.classList.add("before_shuffle");
+    this.board_size_input.disabled = false;
+    this.board_image_input.disabled = false;
+    this.board_image_input.classList.remove("after_shuffle");
+    this.board_image_input.classList.add("before_shuffle");
     this.removeClickHandle();
     this.game.updateHoverStyles(true);
     // this.game.reset();
@@ -470,23 +470,23 @@ class GameLogic {
    * Display splash and remove click handling for board
    */
   endGame() {
-    const congratsModal = document.getElementById("modal");
-    congratsModal.style.display = "block";
+    const congrats_modal = document.getElementById("modal");
+    congrats_modal.style.display = "block";
   }
 }
 
 const game_session = new GameLogic();
 
 const instructions = document.getElementById("instructions");
-const instructionsOk = document.getElementById("instructions_ok");
+const instructions_ok = document.getElementById("instructions_ok");
 instructions.addEventListener("click", () => {
-  const instructionsPopUp = document.getElementById("instructions_popup");
-  instructionsPopUp.style.display = "block";
+  const instructions_pop_up = document.getElementById("instructions_popup");
+  instructions_pop_up.style.display = "block";
 });
 
-instructionsOk.addEventListener("click", () => {
-  const instructionsPopUp = document.getElementById("instructions_popup");
-  instructionsPopUp.style.display = "none";
+instructions_ok.addEventListener("click", () => {
+  const instructions_pop_up = document.getElementById("instructions_popup");
+  instructions_pop_up.style.display = "none";
 });
 
 const shuffle_button = document.getElementById("shuffle-button");
@@ -500,15 +500,15 @@ reset_button.setAttribute(
 );
 reset_button.disabled = true;
 
-const congratsModal = document.getElementById("modal");
+const congrats_modal = document.getElementById("modal");
 
-congratsModal.addEventListener("click", () => {
-  congratsModal.style.display = "none";
+congrats_modal.addEventListener("click", () => {
+  congrats_modal.style.display = "none";
   game_session.resetGame();
 });
 
-const playAgain = document.getElementById("playAgainBtn");
-playAgain.addEventListener("click", () => {
-  congratsModal.style.display = "none";
+const play_again = document.getElementById("playAgainBtn");
+play_again.addEventListener("click", () => {
+  congrats_modal.style.display = "none";
   game_session.initGame();
 });
