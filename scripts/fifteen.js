@@ -268,7 +268,6 @@ class GameLogic {
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
     this.size = 3;
 
-    // this.image = "./assets/bombo.jpg";
     this.image = "./assets/1.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);
     this.click_handle_ref = false;
@@ -287,13 +286,9 @@ class GameLogic {
     let prev = 1;
     boardImageInput.addEventListener("click", () => {
       prev++;
-      let newImg;
-      if (prev > 4) {
-        prev = 1;
-      }
-      newImg = `./assets/${prev}.png`;
+      prev %= 4;
 
-      game_session.changeBoardImage(newImg);
+      game_session.changeBoardImage(`./assets/${prev}.png`);
     });
   }
 
@@ -315,12 +310,14 @@ class GameLogic {
       this.game = new Board(this.size, this.image, this.board_wrapper);
       this.addClickHandle();
     }
-    
   }
   /**
    * Add click handling for tiles
    */
   addClickHandle() {
+    if (this.click_handle_ref) {
+      return;
+    }
     this.click_handle_ref = (event) => {
       this.clickHandler(event);
     };
@@ -330,6 +327,9 @@ class GameLogic {
    * Remove click handling for tiles
    */
   removeClickHandle() {
+    if (!this.click_handle_ref) {
+      return;
+    }
     this.board_wrapper.removeEventListener("click", this.click_handle_ref);
     this.click_handle_ref = false;
   }
@@ -356,9 +356,7 @@ class GameLogic {
    * and shuffle board until shuffled
    */
   initGame() {
-    if (!this.click_handler_ref) {
-      this.addClickHandle();
-    }
+    this.addClickHandle();
     while (this.game.isSolved()) {
       this.game.shuffle();
     }
