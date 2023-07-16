@@ -106,6 +106,7 @@ class Board {
     this.board_wrapper.lastChild.remove();
     this.board[size - 1][size - 1] = null;
   }
+
   /**
    * Iterates over tiles in the board
    * @generator
@@ -119,6 +120,7 @@ class Board {
       }
     }
   }
+
   /**
    *  Swap location of empty tile and tile clicked by user
    *  by shifting column/row of tiles between them towards
@@ -135,6 +137,7 @@ class Board {
       this.moveEmptyV(t_row, e_row, e_col);
     }
   }
+
   /**
    * Add and remove hover style from tiles based on location of
    * empty tile
@@ -161,6 +164,7 @@ class Board {
       }
     }
   }
+
   /**
    * Move a group of tiles horizontally
    * @param {number} num - new column location for empty tile
@@ -177,6 +181,7 @@ class Board {
       this.emptyTile[1] += direction;
     }
   }
+
   /**
    * Move a group of tiles vertically
    * @param {number} num - new row location for empty tile
@@ -193,6 +198,7 @@ class Board {
       this.emptyTile[0] += direction;
     }
   }
+
   /**
    * Update tile backgrounds based on originial positions
    * @param {string} image - new background image
@@ -208,6 +214,7 @@ class Board {
       }
     }
   }
+
   /**
    * Shuffles game board internal representation and
    * updates frontend representation
@@ -240,6 +247,7 @@ class Board {
     }
     this.updateHoverStyles();
   }
+
   /**
    * Reset board back to original state visually and
    * internally
@@ -283,7 +291,6 @@ class GameLogic {
    * Construct game logic class to manage game session
    * @constructor
    */
-  // initializes all instance variables
   constructor() {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
@@ -312,7 +319,6 @@ class GameLogic {
    * @function
    * @memberof Gamelogic
    */
-
   handleBoardSizeInput() {
     const boardSizeInput = document.getElementById("board_size");
     const boardSizeValueElement = document.getElementById("board_size_value");
@@ -436,7 +442,7 @@ class GameLogic {
     this.boardImageInput.classList.add("before_shuffle");
     this.removeClickHandle();
     this.game.updateHoverStyles(true);
-    this.game.reset();
+    // this.game.reset();
     this.invertButtons();
   }
   /**
@@ -445,17 +451,6 @@ class GameLogic {
   endGame() {
     const congratsModal = document.getElementById("modal");
     congratsModal.style.display = "block";
-
-    congratsModal.addEventListener("click", () => {
-      congratsModal.style.display = "none";
-      this.resetGame();
-    });
-
-    const playAgain = document.getElementById("playAgainBtn");
-    playAgain.addEventListener("click", () => {
-      congratsModal.style.display = "none";
-      this.initGame();
-    });
   }
 }
 
@@ -478,5 +473,21 @@ shuffle_button.setAttribute("onclick", "game_session.initGame();");
 shuffle_button.disabled = false;
 
 const reset_button = document.getElementById("reset-button");
-reset_button.setAttribute("onclick", "game_session.resetGame()");
+reset_button.setAttribute(
+  "onclick",
+  "game_session.resetGame(); game_session.game.reset()"
+);
 reset_button.disabled = true;
+
+const congratsModal = document.getElementById("modal");
+
+congratsModal.addEventListener("click", () => {
+  congratsModal.style.display = "none";
+  game_session.resetGame();
+});
+
+const playAgain = document.getElementById("playAgainBtn");
+playAgain.addEventListener("click", () => {
+  congratsModal.style.display = "none";
+  game_session.initGame();
+});
