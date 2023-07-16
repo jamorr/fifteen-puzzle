@@ -60,14 +60,12 @@ class Board {
     this.size = size; // board side length
     this.image = image; // board bg image
 
-    for (let i = 0; i < size; i++) {
-      for (let j = 0; j < size; j++) {
-        const tile_el = document.createElement("div", { is: "tile-w" });
-        tile_el.placeNStyle(i, j, size, image);
+    for (const [i, j, _] of this.tileIter()) {
+      const tile_el = document.createElement("div", { is: "tile-w" });
+      tile_el.placeNStyle(i, j, size, image);
 
-        this.board[i][j] = tile_el;
-        this.board_wrapper.appendChild(tile_el);
-      }
+      this.board[i][j] = tile_el;
+      this.board_wrapper.appendChild(tile_el);
     }
 
     this.emptyTile = [size - 1, size - 1]; // store location of empty tile
@@ -75,6 +73,14 @@ class Board {
     this.board[size - 1][size - 1] = null;
   }
 
+  // iterator that yields tiles and their board pos
+  *tileIter() {
+    for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j < this.size; j++) {
+        yield [i, j, this.board[i][j]];
+      }
+    }
+  }
   // Move tiles row or column if posssible
   moveTiles(tile) {
     const [t_row, t_col] = tile.getBoardPos();
@@ -92,17 +98,14 @@ class Board {
   // ie. remove moveable from old row or col and add to new row or col
   updateHoverStyles() {
     const [e_row, e_col] = this.emptyTile;
-    for (let i = 0; i < this.size; i++) {
-      for (let j = 0; j < this.size; j++) {
-        const tile = this.board[i][j];
-        if (tile === null) {
-          continue;
-        }
-        if (i === e_row || j === e_col) {
-          tile.classList.add("moveable");
-        } else {
-          tile.classList.remove("moveable");
-        }
+    for (const [i, j, tile] of this.tileIter()) {
+      if (tile === null) {
+        continue;
+      }
+      if (i === e_row || j === e_col) {
+        tile.classList.add("moveable");
+      } else {
+        tile.classList.remove("moveable");
       }
     }
   }
@@ -166,7 +169,20 @@ class Board {
     }
     this.updateHoverStyles();
   }
-
+  // end game
+  isSolved() {
+    if (this.board[this.size - 1][this.size - 1] !== null) {
+      return false;
+    }
+    let prev = 0;
+    for (const [_, __, tile] of this.tileIter()) {
+      prev++;
+      if (tile !== null && prev !== tile.getTileNum()) {
+        return false;
+      }
+    }
+    return true;
+  }
   // solve the board for the player
   solve() {}
 }
@@ -177,7 +193,7 @@ class GameLogic {
   constructor() {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
-    this.size = 12;
+    this.size = 2;
 
     // this.image = "./assets/bombo.jpg";
     this.image = "./assets/real_toad.png";
@@ -206,7 +222,8 @@ class GameLogic {
     }
     this.game.moveTiles(element);
     this.game.updateHoverStyles();
-    if (this.isBoardSolved()) {
+    // check if game is over
+    if (this.game.isSolved()) {
       this.endGame();
     }
   }
@@ -217,28 +234,9 @@ class GameLogic {
       this.addClickHandle();
       this.click_handled = true;
     }
-    this.game.shuffle();
-  }
-
-  // end game
-  isBoardSolved() {
-    if (this.game.board[this.size - 1][this.size - 1] !== null) {
-      return false;
+    while (this.game.isSolved()) {
+      this.game.shuffle();
     }
-    let prev = 0;
-    for (let i = 0; i < this.size; i++) {
-      for (
-        let j = 0;
-        j < this.size && i * this.size + j + 1 < this.size * this.size;
-        j++
-      ) {
-        prev++;
-        if (prev !== parseInt(this.game.board[i][j].innerText)) {
-          return false;
-        }
-      }
-    }
-    return true;
   }
 
   endGame() {

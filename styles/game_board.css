@@ -8,7 +8,10 @@ body {
   initial-value: 132deg;
   inherits: false;
 }
-
+.title-header {
+  margin: auto;
+  text-align: center;
+}
 .game-board {
   margin: auto auto;
   display: grid;
