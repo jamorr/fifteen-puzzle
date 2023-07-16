@@ -186,9 +186,7 @@ class GameLogic {
   }
 
   addClickHandle() {
-    this.board_wrapper.addEventListener("click", (event) =>
-      this.clickHandler(event)
-    );
+    this.board_wrapper.addEventListener("click", this.clickHandler.bind(this));
     this.click_handled = true;
   }
 
@@ -208,6 +206,9 @@ class GameLogic {
     }
     this.game.moveTiles(element);
     this.game.updateHoverStyles();
+    if (this.isBoardSolved()) {
+      this.endGame();
+    }
   }
 
   // new game
@@ -220,8 +221,34 @@ class GameLogic {
   }
 
   // end game
-  endGame() {}
+  isBoardSolved() {
+    if (this.game.board[this.size - 1][this.size - 1] !== null) {
+      return false;
+    }
+    let prev = 0;
+    for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j < this.size; j++) {
+        prev++;
+        if (prev !== parseInt(this.game.board[i][j].innerText)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  endGame() {
+    const congratsModal = document.getElementById("modal");
+    congratsModal.style.display = "block";
+
+    const playAgain = document.getElementById("playAgainBtn");
+    playAgain.addEventListener("click", () => {
+      congratsModal.style.display = "none";
+      game_session.initGame();
+    });
+  }
 }
 
 const game_session = new GameLogic();
 game_session.initGame();
+game_session.endGame();
