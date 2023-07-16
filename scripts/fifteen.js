@@ -445,11 +445,11 @@ class GameLogic {
     this.board_image_input.disabled = true;
     this.board_size_input.disabled = true;
 
-    this.board_image_input.classList.add("after_shuffle");
-
     while (this.game.isSolved()) {
       this.game.shuffle();
     }
+    this.board_image_input.classList.remove("before_shuffle");
+    this.board_image_input.classList.add("after_shuffle");
   }
 
   /**
@@ -461,9 +461,9 @@ class GameLogic {
     this.board_image_input.classList.remove("after_shuffle");
     this.board_image_input.classList.add("before_shuffle");
     this.removeClickHandle();
-    this.game.updateHoverStyles(true);
-    // this.game.reset();
     this.invertButtons();
+    this.game.updateHoverStyles(true);
+    this.game.reset();
   }
 
   /**
@@ -472,6 +472,7 @@ class GameLogic {
   endGame() {
     const congrats_modal = document.getElementById("modal");
     congrats_modal.style.display = "block";
+    this.resetGame();
   }
 }
 
@@ -494,17 +495,13 @@ shuffle_button.setAttribute("onclick", "game_session.initGame();");
 shuffle_button.disabled = false;
 
 const reset_button = document.getElementById("reset-button");
-reset_button.setAttribute(
-  "onclick",
-  "game_session.resetGame(); game_session.game.reset()"
-);
+reset_button.setAttribute("onclick", "game_session.resetGame();");
 reset_button.disabled = true;
 
 const congrats_modal = document.getElementById("modal");
 
 congrats_modal.addEventListener("click", () => {
   congrats_modal.style.display = "none";
-  game_session.resetGame();
 });
 
 const play_again = document.getElementById("playAgainBtn");
