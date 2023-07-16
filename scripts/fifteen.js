@@ -298,7 +298,6 @@ class GameLogic {
       this.removeClickHandle();
       this.board_wrapper.innerHTML = "";
       this.game = new Board(this.size, this.image, this.board_wrapper);
-      this.addClickHandle();
     }
   }
 
@@ -308,7 +307,6 @@ class GameLogic {
       this.removeClickHandle();
       this.board_wrapper.innerHTML = "";
       this.game = new Board(this.size, this.image, this.board_wrapper);
-      this.addClickHandle();
     }
   }
   /**
