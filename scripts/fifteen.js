@@ -22,6 +22,29 @@ class Tile extends HTMLDivElement {
     return [row, col];
   }
 
+  getTileNum() {
+    return parseInt(this.innerText);
+  }
+
+  updateBoardPos(n_row, n_col) {
+    // this.style.translate = "";
+    this.style.gridRow = n_row + 1;
+    this.style.gridColumn = n_col + 1;
+  }
+
+  // TODO: add working tile animations here -tis cursed rn
+  translateUpdate(n_row, n_col) {
+    const [c_row, c_col] = this.getBoardPos();
+    const diff_x = n_col - c_col;
+    const diff_y = n_row - c_row;
+    // console.log(`${diff_x * 100}px ${diff_y * 100}px`);
+    // this.style.translate = `${diff_x * 100}px ${diff_y * 100}px`;
+    // setTimeout(() => {
+    //   this.updateBoardPos(n_row, n_col);
+    // }, 100);
+    this.updateBoardPos(n_row, n_col);
+  }
+
   render(parentElement) {
     parentElement.appendChild(this);
   }
@@ -47,21 +70,20 @@ class Board {
       }
     }
 
-    this.emptyTile = this.board_wrapper.lastChild; // empty tile
-    this.emptyTile.classList.add("hidden");
+    this.emptyTile = [size - 1, size - 1]; // store location of empty tile
+    this.board_wrapper.lastChild.remove();
+    this.board[size - 1][size - 1] = null;
   }
 
   // Move tiles row or column if posssible
   moveTiles(tile) {
     const [t_row, t_col] = tile.getBoardPos();
-    const [e_row, e_col] = this.emptyTile.getBoardPos();
+    const [e_row, e_col] = this.emptyTile;
     // update internal board and then update display
     if (t_row === e_row) {
       this.moveEmptyH(t_col, e_row, e_col);
-      this.updateBoardRow(e_row);
     } else if (t_col === e_col) {
       this.moveEmptyV(t_row, e_row, e_col);
-      this.updateBoardCol(e_col);
     }
   }
 
@@ -69,11 +91,13 @@ class Board {
   // TODO: Make this only update tiles that changed instead of full board
   // ie. remove moveable from old row or col and add to new row or col
   updateHoverStyles() {
-    const [e_row, e_col] = this.emptyTile.getBoardPos();
+    const [e_row, e_col] = this.emptyTile;
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
         const tile = this.board[i][j];
-
+        if (tile === null) {
+          continue;
+        }
         if (i === e_row || j === e_col) {
           tile.classList.add("moveable");
         } else {
@@ -86,13 +110,12 @@ class Board {
   // Move empty tile horizontally
   moveEmptyH(num, row, col) {
     const r = row;
-
     const direction = num < col ? -1 : 1;
     for (let c = col; c !== num; c += direction) {
-      [this.board[r][c], this.board[r][c + direction]] = [
-        this.board[r][c + direction],
-        this.board[r][c],
-      ];
+      this.board[r][c + direction].translateUpdate(r, c);
+      this.board[r][c] = this.board[r][c + direction];
+      this.board[r][c + direction] = null;
+      this.emptyTile[1] += direction;
     }
   }
   // Move empty tile vertically
@@ -100,37 +123,27 @@ class Board {
     const c = col;
     const direction = num < row ? -1 : 1;
     for (let r = row; r !== num; r += direction) {
-      [this.board[r][c], this.board[r + direction][c]] = [
-        this.board[r + direction][c],
-        this.board[r][c],
-      ];
-    }
-  }
-  // Update tile location in grid row
-  updateBoardRow(row) {
-    const row_up = this.board[row];
-    for (let i = 0; i < this.size; i++) {
-      row_up[i].style.gridColumn = i + 1;
-    }
-  }
-
-  // update tile location in grid column
-  updateBoardCol(col) {
-    for (let i = 0; i < this.size; i++) {
-      this.board[i][col].style.gridRow = i + 1;
+      this.board[r + direction][c].translateUpdate(r, c);
+      this.board[r][c] = this.board[r + direction][c];
+      this.board[r + direction][c] = null;
+      this.emptyTile[0] += direction;
     }
   }
 
   // update all tile positions
   updateEntireBoard() {
     for (let i = 0; i < this.size; i++) {
-      this.updateBoardCol(i);
-      this.updateBoardRow(i);
+      for (let j = 0; j < this.size; j++) {
+        if (this.board[i][j] === null) {
+          continue;
+        }
+        this.board[i][j].updateBoardPos(i, j);
+      }
     }
   }
   //shuffle board before play begins
   shuffle() {
-    let [e_row, e_col] = this.emptyTile.getBoardPos();
+    let [e_row, e_col] = this.emptyTile;
     for (let i = 0; i < (this.size - 1) * 100; i++) {
       // move to space 1,2,3,...,size-1 of row or column
       // from left to right or top to bottom(dont allow no movement)
@@ -151,7 +164,6 @@ class Board {
         e_col = square;
       }
     }
-    this.updateEntireBoard();
     this.updateHoverStyles();
   }
 
@@ -205,7 +217,6 @@ class GameLogic {
       this.click_handled = true;
     }
     this.game.shuffle();
-    this.game.updateHoverStyles(-1, -1);
   }
 
   // end game
