@@ -294,7 +294,7 @@ class Board {
   }
 }
 
-// manages starting/ending game
+/** Class that manages game start and end and updates to game board settings */
 class GameLogic {
   /**
    * Construct game logic class to manage game session
@@ -428,11 +428,20 @@ class GameLogic {
   }
 
   /**
-   * Invert state of reset and shuffle buttons
+   * Invert state of change image, size slider, reset and shuffle buttons
    */
   invertButtons() {
     this.shuffle_button.disabled = !this.shuffle_button.disabled;
     this.reset_button.disabled = !this.reset_button.disabled;
+    this.board_size_input.disabled = !this.board_size_input.disabled;
+    this.board_image_input.disabled = !this.board_image_input.disabled;
+    if (this.board_image_input.classList.contains("before_shuffle")) {
+      this.board_image_input.classList.remove("before_shuffle");
+      this.board_image_input.classList.add("after_shuffle");
+    } else {
+      this.board_image_input.classList.remove("after_shuffle");
+      this.board_image_input.classList.add("before_shuffle");
+    }
   }
 
   /**
@@ -442,24 +451,16 @@ class GameLogic {
   initGame() {
     this.addClickHandle();
     this.invertButtons();
-    this.board_image_input.disabled = true;
-    this.board_size_input.disabled = true;
 
     while (this.game.isSolved()) {
       this.game.shuffle();
     }
-    this.board_image_input.classList.remove("before_shuffle");
-    this.board_image_input.classList.add("after_shuffle");
   }
 
   /**
    * Reset the game board to solved state
    */
   resetGame() {
-    this.board_size_input.disabled = false;
-    this.board_image_input.disabled = false;
-    this.board_image_input.classList.remove("after_shuffle");
-    this.board_image_input.classList.add("before_shuffle");
     this.removeClickHandle();
     this.invertButtons();
     this.game.updateHoverStyles(true);
