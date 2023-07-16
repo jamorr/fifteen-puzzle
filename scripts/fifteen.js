@@ -24,6 +24,10 @@ class Tile extends HTMLDivElement {
     // all other styling handled in CSS
   }
 
+  /**
+   * Update background image with new image file
+   * @param {string} image - image realtive url
+   */
   updateBackground(image) {
     this.style.background = `url(${image})`;
     const x_off = -this.col * 100;
@@ -32,6 +36,7 @@ class Tile extends HTMLDivElement {
     this.style.backgroundSize = `${bg_factor}px ${bg_factor}px`;
     this.style.backgroundPosition = `${x_off}px ${y_off}px`;
   }
+
   /**
    * Get the tile board position in the board matrix
    * @returns {Number[]} - row and column of tile
@@ -41,6 +46,7 @@ class Tile extends HTMLDivElement {
     const row = parseInt(this.style.gridRow) - 1;
     return [row, col];
   }
+
   /**
    * Get the tile number stored in its inner text
    * @returns {number} - tile number as an integer
@@ -48,6 +54,7 @@ class Tile extends HTMLDivElement {
   getTileNum() {
     return parseInt(this.innerText);
   }
+
   /**
    * Change the location of the tile in the grid and stop animation
    * @param {number} n_row - new row position of tile
@@ -58,6 +65,7 @@ class Tile extends HTMLDivElement {
     this.style.gridRow = n_row + 1;
     this.style.gridColumn = n_col + 1;
   }
+
   /**
    * Activate the tile move animation then update the tile board position
    * @param {number} n_row - new row position of tile
@@ -266,6 +274,7 @@ class Board {
     this.emptyTile = [this.size - 1, this.size - 1];
     this.board = new_board;
   }
+
   /**
    * Checks if game board is solved
    * @returns {boolean} - true if board is solved
@@ -372,6 +381,7 @@ class GameLogic {
       this.game = new Board(this.size, this.image, this.board_wrapper);
     }
   }
+
   /**
    * Add click handling for tiles
    */
@@ -384,6 +394,7 @@ class GameLogic {
     };
     this.board_wrapper.addEventListener("click", this.click_handle_ref);
   }
+
   /**
    * Remove click handling for tiles
    */
@@ -394,6 +405,7 @@ class GameLogic {
     this.board_wrapper.removeEventListener("click", this.click_handle_ref);
     this.click_handle_ref = false;
   }
+
   /**
    * Handles clicks on tiles. Finds closest tile clicked
    * and attempts to move tile. Check if game is over after
@@ -412,10 +424,15 @@ class GameLogic {
       this.endGame();
     }
   }
+
+  /**
+   * Invert state of reset and shuffle buttons
+   */
   invertButtons() {
     this.shuffle_button.disabled = !this.shuffle_button.disabled;
     this.reset_button.disabled = !this.reset_button.disabled;
   }
+
   /**
    * Initialize a new game board and add click handling
    * and shuffle board until shuffled
@@ -432,6 +449,7 @@ class GameLogic {
       this.game.shuffle();
     }
   }
+
   /**
    * Reset the game board to solved state
    */
@@ -445,6 +463,7 @@ class GameLogic {
     // this.game.reset();
     this.invertButtons();
   }
+
   /**
    * Display splash and remove click handling for board
    */
@@ -453,6 +472,8 @@ class GameLogic {
     congratsModal.style.display = "block";
   }
 }
+
+const game_session = new GameLogic();
 
 const instructions = document.getElementById("instructions");
 const instructionsOk = document.getElementById("instructions_ok");
@@ -465,8 +486,6 @@ instructionsOk.addEventListener("click", () => {
   const instructionsPopUp = document.getElementById("instructions_popup");
   instructionsPopUp.style.display = "none";
 });
-
-const game_session = new GameLogic();
 
 const shuffle_button = document.getElementById("shuffle-button");
 shuffle_button.setAttribute("onclick", "game_session.initGame();");
