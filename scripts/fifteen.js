@@ -27,7 +27,7 @@ class Tile extends HTMLDivElement {
   }
 
   updateBoardPos(n_row, n_col) {
-    // this.style.translate = "";
+    this.style.translate = "";
     this.style.gridRow = n_row + 1;
     this.style.gridColumn = n_col + 1;
   }
@@ -35,14 +35,14 @@ class Tile extends HTMLDivElement {
   // TODO: add working tile animations here -tis cursed rn
   translateUpdate(n_row, n_col) {
     const [c_row, c_col] = this.getBoardPos();
-    const diff_x = n_col - c_col;
-    const diff_y = n_row - c_row;
+    const diff_x = n_col - c_col - 1;
+    const diff_y = n_row - c_row - 1;
     // console.log(`${diff_x * 100}px ${diff_y * 100}px`);
-    // this.style.translate = `${diff_x * 100}px ${diff_y * 100}px`;
-    // setTimeout(() => {
-    //   this.updateBoardPos(n_row, n_col);
-    // }, 100);
-    this.updateBoardPos(n_row, n_col);
+    this.style.translate = `${diff_x * 100}px ${diff_y * 100}px`;
+    setTimeout(() => {
+      this.updateBoardPos(n_row, n_col);
+    }, 100);
+    // this.updateBoardPos(n_row, n_col);
   }
 
   render(parentElement) {
@@ -193,7 +193,7 @@ class GameLogic {
   constructor() {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
-    this.size = 2;
+    this.size = 5;
 
     // this.image = "./assets/bombo.jpg";
     this.image = "./assets/real_toad.png";
