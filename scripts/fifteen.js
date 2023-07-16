@@ -15,18 +15,22 @@ class Tile extends HTMLDivElement {
   placeNStyle(row, col, size, image) {
     this.row = row;
     this.col = col;
+    this.size = size;
 
-    this.style.background = `url(${image})`;
-    const x_off = -col * 100;
-    const y_off = -row * 100;
-    const bg_factor = size * 100;
-    this.style.backgroundSize = `${bg_factor}px ${bg_factor}px`;
-    this.style.backgroundPosition = `${x_off}px ${y_off}px`;
-    this.style.gridRow = row + 1;
-    this.style.gridColumn = col + 1;
+    this.updateBackground(image);
+    this.updateBoardPos(row, col);
     this.innerText = row * size + col + 1;
     this.classList.add("tile");
     // all other styling handled in CSS
+  }
+
+  updateBackground(image) {
+    this.style.background = `url(${image})`;
+    const x_off = -this.col * 100;
+    const y_off = -this.row * 100;
+    const bg_factor = this.size * 100;
+    this.style.backgroundSize = `${bg_factor}px ${bg_factor}px`;
+    this.style.backgroundPosition = `${x_off}px ${y_off}px`;
   }
   /**
    * Get the tile board position in the board matrix
@@ -50,7 +54,6 @@ class Tile extends HTMLDivElement {
    * @param {number} n_col - new column position of tile
    */
   updateBoardPos(n_row, n_col) {
-    // this.style.translate = "0px 0px";
     this.style.translate = "";
     this.style.gridRow = n_row + 1;
     this.style.gridColumn = n_col + 1;
@@ -64,9 +67,6 @@ class Tile extends HTMLDivElement {
     const [c_row, c_col] = this.getBoardPos();
     const diff_x = n_col - c_col - 1;
     const diff_y = n_row - c_row - 1;
-    // const diff_x = n_col - c_col;
-    // const diff_y = n_row - c_row;
-    // this.style.translate = "50px 50px";
     this.style.translate = `${diff_x * 100}px ${diff_y * 100}px`;
     setTimeout(() => {
       this.updateBoardPos(n_row, n_col);
@@ -194,16 +194,17 @@ class Board {
     }
   }
   /**
-   * Update tile positions for all tiles on the board
-   * to match with backend representation
+   * Update tile backgrounds based on originial positions
+   * @param {string} image - new background image
    */
-  updateEntireBoard() {
-    for (let i = 0; i < this.size; i++) {
-      for (let j = 0; j < this.size; j++) {
-        if (this.board[i][j] === null) {
-          continue;
-        }
-        this.board[i][j].updateBoardPos(i, j);
+  changeBackgroundImage(image) {
+    this.image = image;
+    let count = this.size * this.size - 1;
+    for (const [i, j, tile] of this.tileIter()) {
+      tile.updateBackground(image);
+      count--;
+      if (count === 0) {
+        break;
       }
     }
   }
@@ -244,6 +245,24 @@ class Board {
     this.updateHoverStyles();
   }
   /**
+   * Reset board back to original state visually and
+   * internally
+   */
+  reset() {
+    const new_board = Array.from(Array(this.size), () => Array(this.size));
+    for (const [__, _, tile] of this.tileIter()) {
+      if (tile === null) {
+        continue;
+      }
+
+      tile.translateUpdate(tile.row, tile.col);
+      new_board[tile.row][tile.col] = tile;
+    }
+    new_board[this.size - 1][this.size - 1] = null;
+    this.emptyTile = [this.size - 1, this.size - 1];
+    this.board = new_board;
+  }
+  /**
    * Checks if game board is solved
    * @returns {boolean} - true if board is solved
    */
@@ -274,14 +293,17 @@ class GameLogic {
   constructor() {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
+
+    this.shuffle_button = document.getElementById("shuffle-button");
+    this.reset_button = document.getElementById("reset-button");
+
     this.size = 3;
 
-    let randomImgNum = Math.floor(Math.random() * 4);
+    const randomImgNum = Math.floor(Math.random() * 4);
 
     this.image = `./assets/${randomImgNum}.png`;
     this.game = new Board(this.size, this.image, this.board_wrapper);
     this.click_handle_ref = false;
-    this.click_handled = false;
 
     this.boardSizeInput = document.getElementById("board_size");
     this.boardImageInput = document.getElementById("board_img_btn");
@@ -290,7 +312,8 @@ class GameLogic {
     this.handleBoardSizeInput();
   }
 
-  /**sets up event handling for the board size input element.
+  /**
+   * sets up event handling for the board size input element.
    * When the input value changes, it updates the board size and displays it
    * @function
    * @memberof Gamelogic
@@ -333,10 +356,8 @@ class GameLogic {
    */
   changeBoardImage(newImg) {
     if (this.image !== newImg) {
+      this.game.changeBackgroundImage(newImg);
       this.image = newImg;
-      this.removeClickHandle();
-      this.board_wrapper.innerHTML = "";
-      this.game = new Board(this.size, this.image, this.board_wrapper);
     }
   }
 
@@ -347,7 +368,6 @@ class GameLogic {
   changeBoardSize(newSize) {
     if (this.size !== newSize) {
       this.size = newSize;
-      this.removeClickHandle();
       this.board_wrapper.innerHTML = "";
       this.game = new Board(this.size, this.image, this.board_wrapper);
     }
@@ -392,16 +412,34 @@ class GameLogic {
       this.endGame();
     }
   }
+  invertButtons() {
+    this.shuffle_button.disabled = !this.shuffle_button.disabled;
+    this.reset_button.disabled = !this.reset_button.disabled;
+  }
   /**
    * Initialize a new game board and add click handling
    * and shuffle board until shuffled
    */
   initGame() {
     this.addClickHandle();
+    this.invertButtons();
 
     while (this.game.isSolved()) {
       this.game.shuffle();
     }
+  }
+  /**
+   * Reset the game board to solved state
+   */
+  resetGame() {
+    this.boardSizeInput.disabled = false;
+    this.boardImageInput.disabled = false;
+    this.boardImageInput.classList.remove("after_shuffle");
+    this.boardImageInput.classList.add("before_shuffle");
+    this.removeClickHandle();
+    this.game.updateHoverStyles(true);
+    this.game.reset();
+    this.invertButtons();
   }
   /**
    * Display splash and remove click handling for board
@@ -412,14 +450,7 @@ class GameLogic {
 
     congratsModal.addEventListener("click", () => {
       congratsModal.style.display = "none";
-
-      this.boardSizeInput.disabled = false;
-      this.boardImageInput.disabled = false;
-      this.boardImageInput.classList.remove("after_shuffle");
-      this.boardImageInput.classList.add("before_shuffle");
-
-      this.removeClickHandle();
-      this.game.updateHoverStyles(true);
+      this.resetGame();
     });
 
     const playAgain = document.getElementById("playAgainBtn");
@@ -443,3 +474,11 @@ instructionsOk.addEventListener("click", () => {
 });
 
 const game_session = new GameLogic();
+
+const shuffle_button = document.getElementById("shuffle-button");
+shuffle_button.setAttribute("onclick", "game_session.initGame();");
+shuffle_button.disabled = false;
+
+const reset_button = document.getElementById("reset-button");
+reset_button.setAttribute("onclick", "game_session.resetGame()");
+reset_button.disabled = true;

@@ -32,7 +32,7 @@
         <p><strong>Tips:</strong></p>
         <p>
           * Once you start playing the game, you cannot change the board size or
-          the board image
+          the board image without resetting the board first
         </p>
         <p>
           * You can slide multiple tiles simultaneously to expedite the
@@ -86,14 +86,22 @@
         <button id="playAgainBtn">Play Again?</button>
       </div>
     </div>
-    <script src="scripts/fifteen.js"></script>
 
-    <button
-      type="button"
-      onclick="game_session.initGame();"
-      class="button-style"
-    >
-      Shuffle
-    </button>
+    <div class="buttons-box">
+      <button type="button" class="button-style" onclick="" id="shuffle-button">
+        Shuffle
+      </button>
+      <button
+        type="button"
+        class="button-style"
+        onclick=""
+        disabled
+        id="reset-button"
+      >
+        Reset
+      </button>
+    </div>
+
+    <script src="scripts/fifteen.js"></script>
   </body>
 </html>

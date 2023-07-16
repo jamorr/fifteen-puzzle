@@ -29,6 +29,16 @@ body {
   margin-bottom: 20px;
 }
 
+.buttons-box {
+  margin: auto;
+  display: inline-block;
+}
+.buttons-box button {
+  margin: 2em;
+  width: 10em;
+  height: 2em;
+}
+
 input:hover {
   cursor: pointer;
 }
