@@ -200,7 +200,7 @@ class Board {
   changeBackgroundImage(image) {
     this.image = image;
     let count = this.size * this.size - 1;
-    for (const [i, j, tile] of this.tileIter()) {
+    for (const [_, __, tile] of this.tileIter()) {
       tile.updateBackground(image);
       count--;
       if (count === 0) {
@@ -214,7 +214,11 @@ class Board {
    */
   shuffle() {
     let [e_row, e_col] = this.emptyTile;
-    for (let i = 0; i < (this.size - 1) * 100; i++) {
+    for (
+      let i = Math.round(Math.random());
+      i < Math.pow(this.size, 2) * 10;
+      i++
+    ) {
       // move to space 1,2,3,...,size-1 of row or column
       // from left to right or top to bottom(dont allow no movement)
       let square = Math.floor(Math.random() * (this.size - 1));
@@ -234,14 +238,6 @@ class Board {
         e_col = square;
       }
     }
-    const boardSizeInput = document.getElementById("board_size");
-    const boardImageInput = document.getElementById("board_img_btn");
-
-    boardSizeInput.disabled = true;
-    boardImageInput.disabled = true;
-    boardImageInput.classList.remove("before_shuffle");
-    boardImageInput.classList.add("after_shuffle");
-
     this.updateHoverStyles();
   }
   /**
@@ -279,8 +275,6 @@ class Board {
     }
     return true;
   }
-  // solve the board for the player
-  solve() {}
 }
 
 // manages starting/ending game
@@ -423,6 +417,10 @@ class GameLogic {
   initGame() {
     this.addClickHandle();
     this.invertButtons();
+    this.boardImageInput.disabled = true;
+    this.boardSizeInput.disabled = true;
+
+    this.boardImageInput.classList.add("after_shuffle");
 
     while (this.game.isSolved()) {
       this.game.shuffle();
@@ -456,7 +454,7 @@ class GameLogic {
     const playAgain = document.getElementById("playAgainBtn");
     playAgain.addEventListener("click", () => {
       congratsModal.style.display = "none";
-      game_session.initGame();
+      this.initGame();
     });
   }
 }
