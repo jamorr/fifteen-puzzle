@@ -16,6 +16,7 @@
 /**
  * @class
  * @classdesc-Class representing a moveable tile on the game board.
+ * @extends HTMLDivElement
  */
 class Tile extends HTMLDivElement {
   /**
@@ -153,9 +154,9 @@ class Board {
     const [e_row, e_col] = this.empty_tile;
     // update internal board and then update display
     if (t_row === e_row) {
-      this.moveEmptyH(t_col, e_row, e_col);
+      this.moveEmptyHorizontally(t_col, e_row, e_col);
     } else if (t_col === e_col) {
-      this.moveEmptyV(t_row, e_row, e_col);
+      this.moveEmptyVertically(t_row, e_row, e_col);
     }
   }
 
@@ -165,8 +166,6 @@ class Board {
    * @param {boolean} [remove=false] - remove hover style from all tiles
    */
   updateHoverStyles(remove = false) {
-    // TODO: Make this only update tiles that changed instead of full board
-    // ie. remove moveable from old row or col and add to new row or col
     let e_row;
     let e_col;
     if (remove === true) {
@@ -192,7 +191,7 @@ class Board {
    * @param {number} row - current empty tile row
    * @param {number} col - current empty tile column
    */
-  moveEmptyH(num, row, col) {
+  moveEmptyHorizontally(num, row, col) {
     const r = row;
     const direction = num < col ? -1 : 1;
     for (let c = col; c !== num; c += direction) {
@@ -209,7 +208,7 @@ class Board {
    * @param {number} row - current empty tile row
    * @param {number} col - current empty tile column
    */
-  moveEmptyV(num, row, col) {
+  moveEmptyVertically(num, row, col) {
     const c = col;
     const direction = num < row ? -1 : 1;
     for (let r = row; r !== num; r += direction) {
@@ -255,14 +254,14 @@ class Board {
         if (square === e_row) {
           square++;
         }
-        this.moveEmptyV(square, e_row, e_col);
+        this.moveEmptyVertically(square, e_row, e_col);
         e_row = square;
       } else {
         //move horizontally
         if (square === e_col) {
           square++;
         }
-        this.moveEmptyH(square, e_row, e_col);
+        this.moveEmptyHorizontally(square, e_row, e_col);
         e_col = square;
       }
     }
