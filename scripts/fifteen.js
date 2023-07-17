@@ -147,7 +147,7 @@ class Board {
    *  Swap location of empty tile and tile clicked by user
    *  by shifting column/row of tiles between them towards
    *  empty tiles current location
-   * @param {Tile} tile - tile to clicked on by user
+   * @param {Tile} tile - tile clicked on by user
    */
   moveTiles(tile) {
     const [t_row, t_col] = tile.getBoardPos();
@@ -360,13 +360,13 @@ class GameLogic {
     });
   }
 
-  /**sets up event handling for the board image input button.
-   * When the button is clicked, it cycles through different images for the board background.
-   * @function
-   * @memberof Gamelogic
+  /**
+   * Sets up event handling for the board image input button.
+   * When the button is clicked, it cycles through different
+   * images for the board background.
    */
   handleBoardImageInput() {
-    const board_image_input = document.getElementById("board_img_btn");
+    const board_image_input = this.board_image_input;
     let prev = 1;
     board_image_input.addEventListener("click", () => {
       prev++;
@@ -377,8 +377,10 @@ class GameLogic {
   }
 
   /**
-   * Changes the image of the board and updates the game accordingly.
-   * @param {string} new_img - The URL or path to the new image for the board.
+   * Changes the image of the board and updates
+   * the game accordingly.
+   * @param {string} new_img - The URL or path
+   * to the new image for the board.
    */
   changeBoardImage(new_img) {
     if (this.image !== new_img) {
@@ -389,7 +391,8 @@ class GameLogic {
 
   /**
    * Changes the size of the board and updates the game accordingly.
-   * @param {number} new_size - The new size for the board. It represents the number of rows and columns.
+   * @param {number} new_size - The new size for the board.
+   * It represents the number of rows and columns.
    */
   changeBoardSize(new_size) {
     if (this.size !== new_size) {
