@@ -1,3 +1,16 @@
+/* Jack Morris && Wook Lee
+ * Group 1
+ * 4 Extra features we covered:
+ *  1.End-of-game notification
+ *  2.Ability to slide multiple squares at once
+ *  3.Multiple backgrounds
+ *  4.Different puzzle sizes
+ *
+ * we also covered 2 more extra features:
+ *  5.Animations and/or transitions
+ *  6.Extra Animation
+ */
+
 "use strict";
 
 /**
@@ -80,14 +93,14 @@ class Tile extends HTMLDivElement {
       this.updateBoardPos(n_row, n_col);
     }, 100);
   }
-
-  render(parentElement) {
-    parentElement.appendChild(this);
-  }
 }
+
 customElements.define("tile-w", Tile, { extends: "div" });
 
-/** class for storing board and core functionality related to it */
+/**
+ * @class
+ * @classdesc - class for storing board and core functionality related to it
+ */
 class Board {
   /**
    * Construct and display new board in sorted order
@@ -294,7 +307,10 @@ class Board {
   }
 }
 
-/** Class that manages game start and end and updates to game board settings */
+/**
+ * @class
+ * @classdesc-Class that manages game start and end and updates to game board settings
+ */
 class GameLogic {
   /**
    * Construct game logic class to manage game session
@@ -307,20 +323,20 @@ class GameLogic {
     this.shuffle_button = document.getElementById("shuffle-button");
     this.reset_button = document.getElementById("reset-button");
 
-    this.size = 3;
+    this.board_size_input = document.getElementById("board_size");
+    this.board_image_input = document.getElementById("board_img_btn");
+
+    this.size = 4;
 
     const random_img_num = Math.floor(Math.random() * 4);
 
     this.image = `./assets/${random_img_num}.png`;
 
     this.game = new Board(this.size, this.image, this.board_wrapper);
-    this.click_handle_ref = false;
-
-    this.board_size_input = document.getElementById("board_size");
-    this.board_image_input = document.getElementById("board_img_btn");
 
     this.handleBoardImageInput();
     this.handleBoardSizeInput();
+    this.click_handle_ref = false;
   }
 
   /**
@@ -330,12 +346,12 @@ class GameLogic {
    * @memberof Gamelogic
    */
   handleBoardSizeInput() {
-    const board_size_input = document.getElementById("board_size");
+    const board_size_input = this.board_size_input;
     const board_size_value_element =
       document.getElementById("board_size_value");
 
     document.addEventListener("DOMContentLoaded", () => {
-      board_size_input.value = 3;
+      board_size_input.value = 4;
     });
 
     board_size_input.addEventListener("input", () => {
@@ -463,6 +479,7 @@ class GameLogic {
   resetGame() {
     this.removeClickHandle();
     this.invertButtons();
+    //remove hover animation
     this.game.updateHoverStyles(true);
     this.game.reset();
   }
@@ -478,6 +495,8 @@ class GameLogic {
 }
 
 const game_session = new GameLogic();
+
+// set up event listeners for controls
 
 const instructions = document.getElementById("instructions");
 const instructions_ok = document.getElementById("instructions_ok");

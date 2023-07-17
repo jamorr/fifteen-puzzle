@@ -4,10 +4,13 @@ body {
   place-content: center center;
 }
 
+/* Main Title  */
 .title-header {
   margin: auto;
   text-align: center;
 }
+
+/* Base styling for buttons */
 .button-style {
   margin: 30px auto;
 }
@@ -15,6 +18,7 @@ body {
   cursor: pointer;
 }
 
+/* Div for control panel items  */
 .controls {
   margin: 0 auto;
   display: flex;
@@ -25,6 +29,7 @@ body {
   margin-bottom: 20px;
 }
 
+/* Box for shuffle and reset buttons  */
 .buttons-box {
   margin: auto;
   display: inline-block;
@@ -39,6 +44,7 @@ input:hover {
   cursor: pointer;
 }
 
+/* Styling for pointer button to cycle through images */
 #board_img {
   width: 40px;
   height: 40px;
@@ -60,6 +66,7 @@ input:hover {
   background-color: #ff4d4d;
 }
 
+/* Instructions modal */
 #instructions_popup {
   position: fixed;
   top: 0;
@@ -87,29 +94,7 @@ input:hover {
   cursor: pointer;
 }
 
-.controls {
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-input:hover {
-  cursor: pointer;
-}
-
-#board_img {
-  width: 40px;
-  height: 40px;
-}
-
-#board_img:hover {
-  cursor: pointer;
-}
-
+/* Game over modal popup */
 #modal {
   position: fixed;
   top: 0;
@@ -145,6 +130,7 @@ input:hover {
   transition: all 0.4s ease;
 }
 
+/* Gameover confetti Animation */
 #confettis {
   overflow: hidden;
   position: absolute;
@@ -229,6 +215,7 @@ input:hover {
   background-color: #f9c4ea;
 }
 
+/* W3 validator  */
 .validators {
   position: fixed;
   bottom: 10px;

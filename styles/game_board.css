@@ -1,3 +1,4 @@
+/* the div that holds tiles  */
 .game-board {
   margin: auto auto;
   display: grid;
@@ -6,6 +7,7 @@
   grid-auto-rows: 100px;
 }
 
+/* tiles  */
 .tile {
   box-sizing: border-box;
   width: 100px;
@@ -23,6 +25,7 @@
   user-select: none;
 }
 
+/* moveable tiles  */
 .moveable {
   cursor: pointer;
 }
@@ -32,8 +35,4 @@
   text-decoration: underline;
   border: 2px solid red;
   cursor: pointer;
-}
-
-.after_shuffle {
-  background-color: #ff3333;
 }
