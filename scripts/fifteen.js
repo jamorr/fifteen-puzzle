@@ -115,11 +115,13 @@ class GameLogic {
     const emptyRow = parseInt(this.game.empty_piece.style.gridRow);
     const emptyCol = parseInt(this.game.empty_piece.style.gridColumn);
 
+    // swapping the grid row and column values between the clicked element and the empty piece
     element.style.gridRow = emptyRow;
     element.style.gridColumn = emptyCol;
     this.game.empty_piece.style.gridRow = elementRow;
     this.game.empty_piece.style.gridColumn = elementCol;
 
+    // update the board to reflect the new positions of the clicked element and the empty piece
     this.game.board[elementRow - 1][elementCol - 1] = this.game.empty_piece;
     this.game.board[emptyRow - 1][emptyCol - 1] = element;
   }
