@@ -1,0 +1,30 @@
+.game-board {
+  display: grid;
+  place-content: center center;
+  grid-auto-columns: 100px;
+  grid-auto-rows: 100px;
+}
+.tile {
+  box-sizing: border-box;
+  width: 100px;
+  height: 100px;
+  border: 2px solid black;
+  font-size: 32pt;
+  font-family: sans-serif;
+  transition: transform 0.5s ease-in, color 0.5s ease-in,
+    text-decoration 0.5s ease-in;
+}
+
+.moveable :hover {
+  color: #006600;
+  text-decoration: underline;
+  border-color: red;
+}
+
+.hidden {
+  display: none;
+}
+
+.tile:hover {
+  cursor: pointer;
+}
