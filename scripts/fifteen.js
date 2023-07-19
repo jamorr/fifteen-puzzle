@@ -54,6 +54,7 @@ class Board {
     if (t_row === e_row) {
       this.moveEmptyH(t_col, e_row, e_col);
       this.updateBoardRow(e_row);
+
       this.updateHoverStyles(t_row, t_col);
     } else if (t_col === e_col) {
       this.moveEmptyV(t_row, e_row, e_col);
@@ -156,6 +157,7 @@ class Board {
     this.updateEntireBoard();
   }
 
+
   // solve the board for the player
   solve() {}
 }
@@ -167,6 +169,7 @@ class GameLogic {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
     this.size = 4;
+
     // this.image = "./assets/bombo.jpg";
     this.image = "./assets/real_toad.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);

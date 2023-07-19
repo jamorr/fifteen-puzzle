@@ -1,14 +1,25 @@
+body {
+  display: flex;
+  flex-direction: column;
+  place-content: center center;
+}
+
 .game-board {
+  margin: auto auto;
   display: grid;
   place-content: center center;
   grid-auto-columns: 100px;
   grid-auto-rows: 100px;
 }
+
 .tile {
   box-sizing: border-box;
   width: 100px;
   height: 100px;
   border: 2px solid black;
+
+  background-clip: border-box;
+  background-origin: border-box;
   font-size: 32pt;
   font-family: sans-serif;
   transition: transform 0.5s ease-in, color 0.5s ease-in,
@@ -31,6 +42,11 @@
   text-decoration: none;
 }
 
+
 .hidden {
-  display: none;
+  visibility: hidden;
+}
+
+#shuffle {
+  margin: 30px auto;
 }
