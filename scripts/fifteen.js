@@ -30,10 +30,12 @@ class Board {
     this.board = Array.from(Array(size), () => Array(size)); // matrix holding html elements
     this.size = size; // board side length
     this.image = image; // board bg image
+
     for (let i = 0; i < size; i++) {
       for (let j = 0; j < size; j++) {
         const tile_el = document.createElement("div", { is: "tile-w" });
         tile_el.placeNStyle(i, j, size, image);
+
         this.board[i][j] = tile_el;
         this.board_wrapper.appendChild(tile_el);
       }
@@ -52,11 +54,37 @@ class Board {
     if (t_row === e_row) {
       this.moveEmptyH(t_col, e_row, e_col);
       this.updateBoardRow(e_row);
+
+      this.updateHoverStyles(t_row, t_col);
     } else if (t_col === e_col) {
       this.moveEmptyV(t_row, e_row, e_col);
       this.updateBoardCol(e_col);
+      this.updateHoverStyles(t_row, t_col);
     }
   }
+
+  // Chick if the tile is movable and update hover styles
+  updateHoverStyles(row, col) {
+    for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j < this.size; j++) {
+        const tile = this.board[i][j];
+        const e_row = parseInt(this.emptyTile.style.gridRow) - 1;
+        const e_col = parseInt(this.emptyTile.style.gridColumn) - 1;
+
+        if (
+          (i === row && Math.abs(j - col) === 1) ||
+          (j === col && Math.abs(i - row) === 1) ||
+          (i === e_row && Math.abs(j - e_col) === 1) ||
+          (j === e_col && Math.abs(i - e_row) === 1)
+        ) {
+          tile.classList.add("moveable");
+        } else {
+          tile.classList.remove("moveable");
+        }
+      }
+    }
+  }
+
   // Move empty tile horizontally
   moveEmptyH(num, row, col) {
     const r = row;
@@ -128,6 +156,8 @@ class Board {
     }
     this.updateEntireBoard();
   }
+
+
   // solve the board for the player
   solve() {}
 }
@@ -138,7 +168,8 @@ class GameLogic {
   constructor() {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
-    this.size = 3;
+    this.size = 4;
+
     // this.image = "./assets/bombo.jpg";
     this.image = "./assets/real_toad.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);
@@ -176,6 +207,7 @@ class GameLogic {
       this.click_handled = true;
     }
     this.game.shuffle();
+    this.game.updateHoverStyles(-1, -1);
   }
 
   // end game
@@ -183,3 +215,4 @@ class GameLogic {
 }
 
 const game_session = new GameLogic();
+game_session.initGame();
