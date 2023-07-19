@@ -15,16 +15,13 @@
     text-decoration 0.5s ease-in;
 }
 
-.moveable :hover {
-  color: #006600;
+.moveable:hover {
+  color: red;
   text-decoration: underline;
-  border-color: red;
+  border: 2px solid red;
+  cursor: pointer;
 }
 
 .hidden {
   display: none;
-}
-
-.tile:hover {
-  cursor: pointer;
 }

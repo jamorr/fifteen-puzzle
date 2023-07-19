@@ -1,16 +1,15 @@
 // game tile HTML element constructor
 class Tile extends HTMLDivElement {
-  constructor() {
-    super();
-  }
   placeNStyle(row, col, size, image) {
     this.row = row;
     this.col = col;
 
     this.style.background = `url(${image})`;
-    const x_off = Math.floor((1 / size) * col * 100);
-    const y_off = Math.floor((1 / size) * row * 100);
-    this.style.backgroundPosition = `${x_off}% ${y_off}%`;
+    const x_off = -col * 100;
+    const y_off = -row * 100;
+    const bg_factor = size * 100;
+    this.style.backgroundSize = `${bg_factor}px ${bg_factor}px`;
+    this.style.backgroundPosition = `${x_off}px ${y_off}px`;
     this.style.gridRow = row + 1;
     this.style.gridColumn = col + 1;
     this.innerText = row * size + col + 1;
@@ -22,27 +21,140 @@ class Tile extends HTMLDivElement {
   }
 }
 customElements.define("tile-w", Tile, { extends: "div" });
-// dataclass for storing board and core functionality related to it
+
+// Dataclass for storing board and core functionality related to it
 class Board {
-  // initialize new board of given size
+  // Initialize new board of given size
   constructor(size, image, board_wrapper) {
-    this.board_wrapper = board_wrapper;
-    this.board = Array.from(Array(size), () => Array(size));
+    this.board_wrapper = board_wrapper; //html div containing grid
+    this.board = Array.from(Array(size), () => Array(size)); // matrix holding html elements
+    this.size = size; // board side length
+    this.image = image; // board bg image
+
     for (let i = 0; i < size; i++) {
       for (let j = 0; j < size; j++) {
         const tile_el = document.createElement("div", { is: "tile-w" });
         tile_el.placeNStyle(i, j, size, image);
+
         this.board[i][j] = tile_el;
         this.board_wrapper.appendChild(tile_el);
       }
     }
-    // handling the bottom right piece of the puzzle
-    this.empty_piece = this.board_wrapper.lastChild;
-    this.empty_piece.classList.add("hidden");
+
+    this.emptyTile = this.board_wrapper.lastChild; // empty tile
+    this.emptyTile.classList.add("hidden");
   }
 
-  // shuffle board before play begins
-  shuffle() {}
+  // Move tiles row or column if posssible
+  moveTiles(tile) {
+    const t_row = parseInt(tile.style.gridRow) - 1;
+    const t_col = parseInt(tile.style.gridColumn) - 1;
+    const e_row = parseInt(this.emptyTile.style.gridRow) - 1;
+    const e_col = parseInt(this.emptyTile.style.gridColumn) - 1;
+    if (t_row === e_row) {
+      this.moveEmptyH(t_col, e_row, e_col);
+      this.updateBoardRow(e_row);
+      this.updateHoverStyles(t_row, t_col);
+    } else if (t_col === e_col) {
+      this.moveEmptyV(t_row, e_row, e_col);
+      this.updateBoardCol(e_col);
+      this.updateHoverStyles(t_row, t_col);
+    }
+  }
+  // Chick if the tile is movable and update hover styles
+  updateHoverStyles(row, col) {
+    for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j < this.size; j++) {
+        const tile = this.board[i][j];
+        const e_row = parseInt(this.emptyTile.style.gridRow) - 1;
+        const e_col = parseInt(this.emptyTile.style.gridColumn) - 1;
+
+        if (
+          (i === row && Math.abs(j - col) === 1) ||
+          (j === col && Math.abs(i - row) === 1) ||
+          (i === e_row && Math.abs(j - e_col) === 1) ||
+          (j === e_col && Math.abs(i - e_row) === 1)
+        ) {
+          tile.classList.add("moveable");
+        } else {
+          tile.classList.remove("moveable");
+        }
+      }
+    }
+  }
+
+  // Move empty tile horizontally
+  moveEmptyH(num, row, col) {
+    const r = row;
+
+    const direction = num < col ? -1 : 1;
+    for (let c = col; c !== num; c += direction) {
+      [this.board[r][c], this.board[r][c + direction]] = [
+        this.board[r][c + direction],
+        this.board[r][c],
+      ];
+    }
+  }
+  // Move empty tile vertically
+  moveEmptyV(num, row, col) {
+    const c = col;
+    const direction = num < row ? -1 : 1;
+    for (let r = row; r !== num; r += direction) {
+      [this.board[r][c], this.board[r + direction][c]] = [
+        this.board[r + direction][c],
+        this.board[r][c],
+      ];
+    }
+  }
+  // Update tile location in grid row
+  updateBoardRow(row) {
+    const row_up = this.board[row];
+    for (let i = 0; i < this.size; i++) {
+      row_up[i].style.gridColumn = i + 1;
+    }
+  }
+
+  // update tile location in grid column
+  updateBoardCol(col) {
+    for (let i = 0; i < this.size; i++) {
+      this.board[i][col].style.gridRow = i + 1;
+    }
+  }
+
+  // update all tile positions
+  updateEntireBoard() {
+    for (let i = 0; i < this.size; i++) {
+      this.updateBoardCol(i);
+      this.updateBoardRow(i);
+    }
+  }
+  //shuffle board before play begins
+  shuffle() {
+    let e_row = parseInt(this.emptyTile.style.gridRow) - 1;
+    let e_col = parseInt(this.emptyTile.style.gridColumn) - 1;
+    for (let i = 0; i < (this.size - 1) * 100; i++) {
+      // move to space 1,2,3,...,size-1 of row or column
+      // from left to right or top to bottom(dont allow no movement)
+      let square = Math.floor(Math.random() * (this.size - 1));
+      if (Math.floor(i % 2) === 0) {
+        //move vertically
+        if (square === e_row) {
+          square++;
+        }
+        this.moveEmptyV(square, e_row, e_col);
+        e_row = square;
+      } else {
+        //move horizontally
+        if (square === e_col) {
+          square++;
+        }
+        this.moveEmptyH(square, e_row, e_col);
+        e_col = square;
+      }
+    }
+    this.updateEntireBoard();
+  }
+
   // solve the board for the player
   solve() {}
 }
@@ -53,21 +165,24 @@ class GameLogic {
   constructor() {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
-    this.size = 4;
+    this.size = 8;
+    // this.image = "./assets/bombo.jpg";
     this.image = "./assets/real_toad.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);
-    this.addClickHandle();
+    this.click_handled = false;
   }
+
   addClickHandle() {
     this.board_wrapper.addEventListener("click", (event) =>
       this.clickHandler(event)
     );
+    this.click_handled = true;
   }
 
   removeClickHandle() {
-    this.board_wrapper.removeEventListener("click", (event) => {
-      this.clickHandler;
-    });
+    this.board_wrapper.removeEventListener("click", (event) =>
+      this.clickHandler(event)
+    );
   }
 
   // handles player click on board
@@ -75,56 +190,25 @@ class GameLogic {
   // returns tile if found or null if not
   clickHandler(event) {
     const element = event.target.closest(".tile");
-    const elementRow = parseInt(element.style.gridRow[0]);
-    const elementCol = parseInt(element.style.gridColumn[0]);
-
-    const emptyRow = parseInt(this.game.empty_piece.style.gridRow);
-    const emptyCol = parseInt(this.game.empty_piece.style.gridColumn);
-
     if (element === null) {
       return;
     }
-    if (
-      (elementRow === emptyRow && Math.abs(elementCol - emptyCol) === 1) ||
-      (elementCol === emptyCol && Math.abs(elementRow - emptyRow) === 1)
-    ) {
-      element.classList.add("movable");
-      this.movePiece(element);
-      console.log("movable");
-    } else {
-      console.log("not movable");
-    }
-
-    // console.log(element);
+    this.game.moveTiles(element);
   }
+
   // new game
   initGame() {
-    // Shuffle the board
+    if (!this.click_handled) {
+      this.addClickHandle();
+      this.click_handled = true;
+    }
     this.game.shuffle();
-    this.addClickHandle();
+    this.game.updateHoverStyles(-1, -1);
   }
 
   // end game
   endGame() {}
-
-  // make move
-  movePiece(tile) {
-    const element = tile;
-    const elementRow = parseInt(element.style.gridRow);
-    const elementCol = parseInt(element.style.gridColumn);
-    const emptyRow = parseInt(this.game.empty_piece.style.gridRow);
-    const emptyCol = parseInt(this.game.empty_piece.style.gridColumn);
-
-    // swapping the grid row and column values between the clicked element and the empty piece
-    element.style.gridRow = emptyRow;
-    element.style.gridColumn = emptyCol;
-    this.game.empty_piece.style.gridRow = elementRow;
-    this.game.empty_piece.style.gridColumn = elementCol;
-
-    // update the board to reflect the new positions of the clicked element and the empty piece
-    this.game.board[elementRow - 1][elementCol - 1] = this.game.empty_piece;
-    this.game.board[emptyRow - 1][emptyCol - 1] = element;
-  }
 }
 
-var game_session = new GameLogic();
+const game_session = new GameLogic();
+game_session.initGame();
