@@ -13,6 +13,14 @@
   font-family: sans-serif;
   transition: transform 0.5s ease-in, color 0.5s ease-in,
     text-decoration 0.5s ease-in;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+}
+
+.moveable {
+  cursor: hand;
 }
 
 .moveable:hover {
@@ -20,6 +28,7 @@
   text-decoration: underline;
   border: 2px solid red;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .hidden {

@@ -61,6 +61,7 @@ class Board {
       this.updateHoverStyles(t_row, t_col);
     }
   }
+
   // Chick if the tile is movable and update hover styles
   updateHoverStyles(row, col) {
     for (let i = 0; i < this.size; i++) {
@@ -165,7 +166,7 @@ class GameLogic {
   constructor() {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
-    this.size = 8;
+    this.size = 4;
     // this.image = "./assets/bombo.jpg";
     this.image = "./assets/real_toad.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);
