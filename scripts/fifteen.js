@@ -174,9 +174,7 @@ class GameLogic {
   }
 
   addClickHandle() {
-    this.board_wrapper.addEventListener("click", (event) =>
-      this.clickHandler(event)
-    );
+    this.board_wrapper.addEventListener("click", this.clickHandler.bind(this));
     this.click_handled = true;
   }
 
@@ -196,6 +194,7 @@ class GameLogic {
     }
     this.game.moveTiles(element);
     this.game.updateHoverStyles();
+    this.endGame();
   }
 
   // new game
@@ -227,16 +226,19 @@ class GameLogic {
     }
   }
   endGame() {
-    const congratsModal = document.getElementById("modal");
-    congratsModal.style.display = "block";
+    if (this.isBoardSolved()) {
+      const congratsModal = document.getElementById("modal");
+      congratsModal.style.display = "block";
 
-    const playAgain = document.getElementById("playAgainBtn");
-    playAgain.addEventListener("click", () => {
-      congratsModal.style.display = "none";
-      game_session.initGame();
-    });
+      const playAgain = document.getElementById("playAgainBtn");
+      playAgain.addEventListener("click", () => {
+        congratsModal.style.display = "none";
+        game_session.initGame();
+      });
+    }
   }
 }
 
 const game_session = new GameLogic();
 game_session.initGame();
+game_session.endGame();
