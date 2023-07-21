@@ -297,6 +297,10 @@ class GameLogic {
     });
   }
 
+  /**
+   * Changes the image of the board and updates the game accordingly.
+   * @param {string} newImg - The URL or path to the new image for the board.
+   */
   changeBoardImage(newImg) {
     if (this.image !== newImg) {
       this.image = newImg;
@@ -307,6 +311,10 @@ class GameLogic {
     }
   }
 
+  /**
+   * Changes the size of the board and updates the game accordingly.
+   * @param {number} newSize - The new size for the board. It represents the number of rows and columns.
+   */
   changeBoardSize(newSize) {
     if (this.size !== newSize) {
       this.size = newSize;

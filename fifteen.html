@@ -11,22 +11,26 @@
 
     <button type="button" class="button-style">Instructions</button>
 
-    <div>
-      <label for="board_size">select board size</label>
-      <br />
-      <input
-        type="range"
-        id="board_size"
-        name="board_size"
-        min="3"
-        max="8"
-        step="1"
-        value="3"
-      />
-      <span id="board_size_value">3x3</span>
-      <br />
-      <p>select board image</p>
-      <img id="board_img" src="./assets/select.png" alt="select_img" />
+    <div class="controls">
+      <div>
+        <label for="board_size">select board size</label>
+        <br />
+        <input
+          type="range"
+          id="board_size"
+          name="board_size"
+          min="2"
+          max="8"
+          step="1"
+          value="3"
+        />
+        <span id="board_size_value">3x3</span>
+      </div>
+      <div>
+        <br />
+        <p>select board image</p>
+        <img id="board_img" src="./assets/select.png" alt="select_img" />
+      </div>
     </div>
 
     <div class="game-board"></div>
