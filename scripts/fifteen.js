@@ -233,6 +233,14 @@ class Board {
         e_col = square;
       }
     }
+    const boardSizeInput = document.getElementById("board_size");
+    const boardImageInput = document.getElementById("board_img_btn");
+
+    boardSizeInput.disabled = true;
+    boardImageInput.disabled = true;
+    boardImageInput.classList.remove("before_shuffle");
+    boardImageInput.classList.add("after_shuffle");
+
     this.updateHoverStyles();
   }
   /**
@@ -275,6 +283,20 @@ class GameLogic {
     this.click_handle_ref = false;
     this.click_handled = false;
 
+    this.boardSizeInput = document.getElementById("board_size");
+    this.boardImageInput = document.getElementById("board_img_btn");
+
+    this.handleBoardImageInput();
+    this.handleBoardSizeInput();
+  }
+
+  /**sets up event handling for the board size input element.
+   * When the input value changes, it updates the board size and displays it
+   * @function
+   * @memberof Gamelogic
+   */
+
+  handleBoardSizeInput() {
     const boardSizeInput = document.getElementById("board_size");
     const boardSizeValueElement = document.getElementById("board_size_value");
 
@@ -285,16 +307,23 @@ class GameLogic {
     boardSizeInput.addEventListener("input", () => {
       const newSize = parseInt(boardSizeInput.value);
       boardSizeValueElement.textContent = `${newSize}x${newSize}`;
-      game_session.changeBoardSize(newSize);
+      this.changeBoardSize(newSize);
     });
+  }
 
-    const boardImageInput = document.getElementById("board_img");
+  /**sets up event handling for the board image input button.
+   * When the button is clicked, it cycles through different images for the board background.
+   * @function
+   * @memberof Gamelogic
+   */
+  handleBoardImageInput() {
+    const boardImageInput = document.getElementById("board_img_btn");
     let prev = 1;
     boardImageInput.addEventListener("click", () => {
       prev++;
       prev %= 4;
 
-      game_session.changeBoardImage(`./assets/${prev}.png`);
+      this.changeBoardImage(`./assets/${prev}.png`);
     });
   }
 
@@ -308,7 +337,6 @@ class GameLogic {
       this.removeClickHandle();
       this.board_wrapper.innerHTML = "";
       this.game = new Board(this.size, this.image, this.board_wrapper);
-      this.addClickHandle();
     }
   }
 
@@ -322,7 +350,6 @@ class GameLogic {
       this.removeClickHandle();
       this.board_wrapper.innerHTML = "";
       this.game = new Board(this.size, this.image, this.board_wrapper);
-      this.addClickHandle();
     }
   }
   /**
@@ -371,6 +398,7 @@ class GameLogic {
    */
   initGame() {
     this.addClickHandle();
+
     while (this.game.isSolved()) {
       this.game.shuffle();
     }
@@ -381,8 +409,15 @@ class GameLogic {
   endGame() {
     const congratsModal = document.getElementById("modal");
     congratsModal.style.display = "block";
+
     congratsModal.addEventListener("click", () => {
       congratsModal.style.display = "none";
+
+      this.boardSizeInput.disabled = false;
+      this.boardImageInput.disabled = false;
+      this.boardImageInput.classList.remove("after_shuffle");
+      this.boardImageInput.classList.add("before_shuffle");
+
       this.removeClickHandle();
       this.game.updateHoverStyles(true);
     });

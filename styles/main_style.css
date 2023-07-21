@@ -39,6 +39,18 @@ input:hover {
   cursor: pointer;
 }
 
+#board_img_btn {
+  border-radius: 50%;
+}
+
+.before_shuffle {
+  background-color: #99e699;
+}
+
+.after_shuffle {
+  background-color: #ff4d4d;
+}
+
 #modal {
   position: fixed;
   top: 0;
