@@ -278,6 +278,10 @@ class GameLogic {
     const boardSizeInput = document.getElementById("board_size");
     const boardSizeValueElement = document.getElementById("board_size_value");
 
+    document.addEventListener("DOMContentLoaded", () => {
+      boardSizeInput.value = 3;
+    });
+
     boardSizeInput.addEventListener("input", () => {
       const newSize = parseInt(boardSizeInput.value);
       boardSizeValueElement.textContent = `${newSize}x${newSize}`;
