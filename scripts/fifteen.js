@@ -430,4 +430,16 @@ class GameLogic {
   }
 }
 
+const instructions = document.getElementById("instructions");
+const instructionsOk = document.getElementById("instructions_ok");
+instructions.addEventListener("click", () => {
+  const instructionsPopUp = document.getElementById("instructions_popup");
+  instructionsPopUp.style.display = "block";
+});
+
+instructionsOk.addEventListener("click", () => {
+  const instructionsPopUp = document.getElementById("instructions_popup");
+  instructionsPopUp.style.display = "none";
+});
+
 const game_session = new GameLogic();
