@@ -1,5 +1,17 @@
-// game tile HTML element constructor
+"use strict";
+
+/**
+ * @class
+ * @classdesc-Class representing a moveable tile on the game board.
+ */
 class Tile extends HTMLDivElement {
+  /**
+   * Place and style the tile in the board
+   * @param {number} row - tile row in board matrix
+   * @param {number} col - tile column in board matrix
+   * @param {number} size - side length of the board
+   * @param {string} image - image file to use as bg
+   */
   placeNStyle(row, col, size, image) {
     this.row = row;
     this.col = col;
@@ -16,33 +28,49 @@ class Tile extends HTMLDivElement {
     this.classList.add("tile");
     // all other styling handled in CSS
   }
+  /**
+   * Get the tile board position in the board matrix
+   * @returns {Number[]} - row and column of tile
+   */
   getBoardPos() {
     const col = parseInt(this.style.gridColumn) - 1;
     const row = parseInt(this.style.gridRow) - 1;
     return [row, col];
   }
-
+  /**
+   * Get the tile number stored in its inner text
+   * @returns {number} - tile number as an integer
+   */
   getTileNum() {
     return parseInt(this.innerText);
   }
-
+  /**
+   * Change the location of the tile in the grid and stop animation
+   * @param {number} n_row - new row position of tile
+   * @param {number} n_col - new column position of tile
+   */
   updateBoardPos(n_row, n_col) {
+    // this.style.translate = "0px 0px";
     this.style.translate = "";
     this.style.gridRow = n_row + 1;
     this.style.gridColumn = n_col + 1;
   }
-
-  // TODO: add working tile animations here -tis cursed rn
+  /**
+   * Activate the tile move animation then update the tile board position
+   * @param {number} n_row - new row position of tile
+   * @param {number} n_col - new column position of tile
+   */
   translateUpdate(n_row, n_col) {
     const [c_row, c_col] = this.getBoardPos();
     const diff_x = n_col - c_col - 1;
     const diff_y = n_row - c_row - 1;
-    // console.log(`${diff_x * 100}px ${diff_y * 100}px`);
+    // const diff_x = n_col - c_col;
+    // const diff_y = n_row - c_row;
+    // this.style.translate = "50px 50px";
     this.style.translate = `${diff_x * 100}px ${diff_y * 100}px`;
     setTimeout(() => {
       this.updateBoardPos(n_row, n_col);
     }, 100);
-    // this.updateBoardPos(n_row, n_col);
   }
 
   render(parentElement) {
@@ -51,9 +79,15 @@ class Tile extends HTMLDivElement {
 }
 customElements.define("tile-w", Tile, { extends: "div" });
 
-// Dataclass for storing board and core functionality related to it
+/** class for storing board and core functionality related to it */
 class Board {
-  // Initialize new board of given size
+  /**
+   * Construct and display new board in sorted order
+   * @constructor
+   * @param {number} size - side length of the board
+   * @param {string} image - background image to use for board
+   * @param {HTMLDivElement} board_wrapper - div to place tiles into
+   */
   constructor(size, image, board_wrapper) {
     this.board_wrapper = board_wrapper; //html div containing grid
     this.board = Array.from(Array(size), () => Array(size)); // matrix holding html elements
@@ -72,8 +106,12 @@ class Board {
     this.board_wrapper.lastChild.remove();
     this.board[size - 1][size - 1] = null;
   }
-
-  // iterator that yields tiles and their board pos
+  /**
+   * Iterates over tiles in the board
+   * @generator
+   * @yields {[number, number, Tile]} - tile row and column and
+   * tiles on board from top to bottom left to right
+   */
   *tileIter() {
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
@@ -81,7 +119,12 @@ class Board {
       }
     }
   }
-  // Move tiles row or column if posssible
+  /**
+   *  Swap location of empty tile and tile clicked by user
+   *  by shifting column/row of tiles between them towards
+   *  empty tiles current location
+   * @param {Tile} tile - tile to clicked on by user
+   */
   moveTiles(tile) {
     const [t_row, t_col] = tile.getBoardPos();
     const [e_row, e_col] = this.emptyTile;
@@ -92,12 +135,21 @@ class Board {
       this.moveEmptyV(t_row, e_row, e_col);
     }
   }
-
-  // Chick if the tile is movable and update hover styles
-  // TODO: Make this only update tiles that changed instead of full board
-  // ie. remove moveable from old row or col and add to new row or col
-  updateHoverStyles() {
-    const [e_row, e_col] = this.emptyTile;
+  /**
+   * Add and remove hover style from tiles based on location of
+   * empty tile
+   * @param {boolean} [remove=false] - remove hover style from all tiles
+   */
+  updateHoverStyles(remove = false) {
+    // TODO: Make this only update tiles that changed instead of full board
+    // ie. remove moveable from old row or col and add to new row or col
+    let e_row;
+    let e_col;
+    if (remove === true) {
+      [e_row, e_col] = [-1, -1];
+    } else {
+      [e_row, e_col] = this.emptyTile;
+    }
     for (const [i, j, tile] of this.tileIter()) {
       if (tile === null) {
         continue;
@@ -109,8 +161,12 @@ class Board {
       }
     }
   }
-
-  // Move empty tile horizontally
+  /**
+   * Move a group of tiles horizontally
+   * @param {number} num - new column location for empty tile
+   * @param {number} row - current empty tile row
+   * @param {number} col - current empty tile column
+   */
   moveEmptyH(num, row, col) {
     const r = row;
     const direction = num < col ? -1 : 1;
@@ -121,7 +177,12 @@ class Board {
       this.emptyTile[1] += direction;
     }
   }
-  // Move empty tile vertically
+  /**
+   * Move a group of tiles vertically
+   * @param {number} num - new row location for empty tile
+   * @param {number} row - current empty tile row
+   * @param {number} col - current empty tile column
+   */
   moveEmptyV(num, row, col) {
     const c = col;
     const direction = num < row ? -1 : 1;
@@ -132,8 +193,10 @@ class Board {
       this.emptyTile[0] += direction;
     }
   }
-
-  // update all tile positions
+  /**
+   * Update tile positions for all tiles on the board
+   * to match with backend representation
+   */
   updateEntireBoard() {
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
@@ -144,7 +207,10 @@ class Board {
       }
     }
   }
-  //shuffle board before play begins
+  /**
+   * Shuffles game board internal representation and
+   * updates frontend representation
+   */
   shuffle() {
     let [e_row, e_col] = this.emptyTile;
     for (let i = 0; i < (this.size - 1) * 100; i++) {
@@ -169,7 +235,10 @@ class Board {
     }
     this.updateHoverStyles();
   }
-  // end game
+  /**
+   * Checks if game board is solved
+   * @returns {boolean} - true if board is solved
+   */
   isSolved() {
     if (this.board[this.size - 1][this.size - 1] !== null) {
       return false;
@@ -189,6 +258,10 @@ class Board {
 
 // manages starting/ending game
 class GameLogic {
+  /**
+   * Construct game logic class to manage game session
+   * @constructor
+   */
   // initializes all instance variables
   constructor() {
     // get from player inputs or set a default
@@ -198,6 +271,7 @@ class GameLogic {
     // this.image = "./assets/bombo.jpg";
     this.image = "./assets/1.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);
+    this.click_handle_ref = false;
     this.click_handled = false;
 
     const boardSizeInput = document.getElementById("board_size");
@@ -241,22 +315,30 @@ class GameLogic {
       this.game = new Board(this.size, this.image, this.board_wrapper);
       this.addClickHandle();
     }
+    
   }
-
+  /**
+   * Add click handling for tiles
+   */
   addClickHandle() {
-    this.board_wrapper.addEventListener("click", this.clickHandler.bind(this));
-    this.click_handled = true;
+    this.click_handle_ref = (event) => {
+      this.clickHandler(event);
+    };
+    this.board_wrapper.addEventListener("click", this.click_handle_ref);
   }
-
+  /**
+   * Remove click handling for tiles
+   */
   removeClickHandle() {
-    this.board_wrapper.removeEventListener("click", (event) =>
-      this.clickHandler(event)
-    );
+    this.board_wrapper.removeEventListener("click", this.click_handle_ref);
+    this.click_handle_ref = false;
   }
-
-  // handles player click on board
-  // finds tile clicked using target
-  // returns tile if found or null if not
+  /**
+   * Handles clicks on tiles. Finds closest tile clicked
+   * and attempts to move tile. Check if game is over after
+   * moving
+   * @param {event} click
+   */
   clickHandler(event) {
     const element = event.target.closest(".tile");
     if (element === null) {
@@ -269,21 +351,29 @@ class GameLogic {
       this.endGame();
     }
   }
-
-  // new game
+  /**
+   * Initialize a new game board and add click handling
+   * and shuffle board until shuffled
+   */
   initGame() {
-    if (!this.click_handled) {
+    if (!this.click_handler_ref) {
       this.addClickHandle();
-      this.click_handled = true;
     }
     while (this.game.isSolved()) {
       this.game.shuffle();
     }
   }
-
+  /**
+   * Display splash and remove click handling for board
+   */
   endGame() {
     const congratsModal = document.getElementById("modal");
     congratsModal.style.display = "block";
+    congratsModal.addEventListener("click", () => {
+      congratsModal.style.display = "none";
+      this.removeClickHandle();
+      this.game.updateHoverStyles(true);
+    });
 
     const playAgain = document.getElementById("playAgainBtn");
     playAgain.addEventListener("click", () => {
@@ -294,5 +384,3 @@ class GameLogic {
 }
 
 const game_session = new GameLogic();
-
-// game_session.endGame();
