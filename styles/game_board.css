@@ -33,16 +33,3 @@
   border: 2px solid red;
   cursor: pointer;
 }
-
-
-#board_img {
-  width: 40px;
-  height: 40px;
-  margin-left: 35px;
-}
-
-#board_img:hover {
-  cursor: pointer;
-}
-
-
