@@ -193,12 +193,54 @@ class GameLogic {
   constructor() {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
-    this.size = 5;
+    this.size = 3;
 
     // this.image = "./assets/bombo.jpg";
-    this.image = "./assets/real_toad.png";
+    this.image = "./assets/1.png";
     this.game = new Board(this.size, this.image, this.board_wrapper);
     this.click_handled = false;
+
+    const boardSizeInput = document.getElementById("board_size");
+    const boardSizeValueElement = document.getElementById("board_size_value");
+
+    boardSizeInput.addEventListener("input", () => {
+      const newSize = parseInt(boardSizeInput.value);
+      boardSizeValueElement.textContent = `${newSize}x${newSize}`;
+      game_session.changeBoardSize(newSize);
+    });
+
+    const boardImageInput = document.getElementById("board_img");
+    let prev = 1;
+    boardImageInput.addEventListener("click", () => {
+      prev++;
+      let newImg;
+      if (prev > 4) {
+        prev = 1;
+      }
+      newImg = `./assets/${prev}.png`;
+
+      game_session.changeBoardImage(newImg);
+    });
+  }
+
+  changeBoardImage(newImg) {
+    if (this.image !== newImg) {
+      this.image = newImg;
+      this.removeClickHandle();
+      this.board_wrapper.innerHTML = "";
+      this.game = new Board(this.size, this.image, this.board_wrapper);
+      this.addClickHandle();
+    }
+  }
+
+  changeBoardSize(newSize) {
+    if (this.size !== newSize) {
+      this.size = newSize;
+      this.removeClickHandle();
+      this.board_wrapper.innerHTML = "";
+      this.game = new Board(this.size, this.image, this.board_wrapper);
+      this.addClickHandle();
+    }
   }
 
   addClickHandle() {
@@ -252,5 +294,5 @@ class GameLogic {
 }
 
 const game_session = new GameLogic();
-game_session.initGame();
+
 // game_session.endGame();
