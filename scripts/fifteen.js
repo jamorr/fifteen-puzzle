@@ -268,7 +268,9 @@ class GameLogic {
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
     this.size = 3;
 
-    this.image = "./assets/1.png";
+    let randomImgNum = Math.floor(Math.random() * 4);
+
+    this.image = `./assets/${randomImgNum}.png`;
     this.game = new Board(this.size, this.image, this.board_wrapper);
     this.click_handle_ref = false;
     this.click_handled = false;
@@ -292,21 +294,31 @@ class GameLogic {
     });
   }
 
+  /**
+   * Changes the image of the board and updates the game accordingly.
+   * @param {string} newImg - The URL or path to the new image for the board.
+   */
   changeBoardImage(newImg) {
     if (this.image !== newImg) {
       this.image = newImg;
       this.removeClickHandle();
       this.board_wrapper.innerHTML = "";
       this.game = new Board(this.size, this.image, this.board_wrapper);
+      this.addClickHandle();
     }
   }
 
+  /**
+   * Changes the size of the board and updates the game accordingly.
+   * @param {number} newSize - The new size for the board. It represents the number of rows and columns.
+   */
   changeBoardSize(newSize) {
     if (this.size !== newSize) {
       this.size = newSize;
       this.removeClickHandle();
       this.board_wrapper.innerHTML = "";
       this.game = new Board(this.size, this.image, this.board_wrapper);
+      this.addClickHandle();
     }
   }
   /**
