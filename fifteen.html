@@ -7,11 +7,28 @@
     <link rel="stylesheet" type="text/css" href="styles/game_board.css" />
   </head>
   <body>
-    <h1 class="title-header"></h1>
+    <h1 class="title-header">Fifteen Puzzle</h1>
 
     <button type="button" class="button-style">Instructions</button>
 
     <div class="game-board"></div>
+    <div id="modal">
+      <div id="confettis">
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+      </div>
+      <div class="modal-content">
+        <p>Congratulations, you solved the puzzle!</p>
+        <button id="playAgainBtn">Play Again?</button>
+      </div>
+    </div>
     <script src="scripts/fifteen.js"></script>
     <button
       type="button"
