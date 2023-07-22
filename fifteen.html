@@ -1,3 +1,18 @@
+<!-- 
+4 Extra features we covered:
+
+  1.End-of-game notification
+  2.Ability to slide multiple squares at once
+  3.Multiple backgrounds
+  4.Different puzzle sizes
+
+we also covered 2 more extra features:
+
+  5.Animations and/or transitions
+  6.Extra Animation
+
+ -->
+
 <!DOCTYPE html>
 
 <html lang="en">
@@ -53,9 +68,7 @@
           id="board_size"
           name="board_size"
           min="2"
-
           max="10"
-
           step="1"
           value="3"
         />
@@ -68,7 +81,6 @@
         <button id="board_img_btn" class="before_shuffle">
           <img id="board_img" src="./assets/select.png" alt="select_img" />
         </button>
-
       </div>
     </div>
 
@@ -104,6 +116,10 @@
       >
         Reset
       </button>
+    </div>
+    <div class="validators">
+      <img src="./assets/valid-html.png" alt="html-validator-icon" />
+      <img src="./assets//valid-css.png" alt="css-validator-icon" />
     </div>
 
     <script src="scripts/fifteen.js"></script>
