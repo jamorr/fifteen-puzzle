@@ -312,6 +312,7 @@ class GameLogic {
     const randomImgNum = Math.floor(Math.random() * 4);
 
     this.image = `./assets/${randomImgNum}.png`;
+
     this.game = new Board(this.size, this.image, this.board_wrapper);
     this.click_handle_ref = false;
 
@@ -356,6 +357,7 @@ class GameLogic {
       prev %= 4;
 
       this.changeBoardImage(`./assets/${prev}.png`);
+
     });
   }
 
