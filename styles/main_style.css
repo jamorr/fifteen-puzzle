@@ -180,7 +180,7 @@ input:hover {
 
 .confetti:nth-child(1) {
   left: 10%;
-  animation-delay: 0;
+  animation-delay: 0s;
   background-color: #fc0120;
 }
 .confetti:nth-child(2) {
