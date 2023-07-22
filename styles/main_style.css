@@ -15,6 +15,81 @@ body {
 .button-style {
   margin: 30px auto;
 }
+.button-style:hover {
+  cursor: pointer;
+}
+
+.controls {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.buttons-box {
+  margin: auto;
+  display: inline-block;
+}
+.buttons-box button {
+  margin: 2em;
+  width: 10em;
+  height: 2em;
+}
+
+input:hover {
+  cursor: pointer;
+}
+
+#board_img {
+  width: 40px;
+  height: 40px;
+}
+
+#board_img:hover {
+  cursor: pointer;
+}
+
+#board_img_btn {
+  border-radius: 50%;
+}
+
+.before_shuffle {
+  background-color: #99e699;
+}
+
+.after_shuffle {
+  background-color: #ff4d4d;
+}
+
+#instructions_popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 9999;
+}
+
+.instructions_popup_content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: black;
+}
+
+#instructions_ok:hover {
+  cursor: pointer;
+}
 
 .controls {
   margin: 0 auto;

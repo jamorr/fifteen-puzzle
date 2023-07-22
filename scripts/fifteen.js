@@ -15,19 +15,28 @@ class Tile extends HTMLDivElement {
   placeNStyle(row, col, size, image) {
     this.row = row;
     this.col = col;
+    this.size = size;
 
-    this.style.background = `url(${image})`;
-    const x_off = -col * 100;
-    const y_off = -row * 100;
-    const bg_factor = size * 100;
-    this.style.backgroundSize = `${bg_factor}px ${bg_factor}px`;
-    this.style.backgroundPosition = `${x_off}px ${y_off}px`;
-    this.style.gridRow = row + 1;
-    this.style.gridColumn = col + 1;
+    this.updateBackground(image);
+    this.updateBoardPos(row, col);
     this.innerText = row * size + col + 1;
     this.classList.add("tile");
     // all other styling handled in CSS
   }
+
+  /**
+   * Update background image with new image file
+   * @param {string} image - image realtive url
+   */
+  updateBackground(image) {
+    this.style.background = `url(${image})`;
+    const x_off = -this.col * 100;
+    const y_off = -this.row * 100;
+    const bg_factor = this.size * 100;
+    this.style.backgroundSize = `${bg_factor}px ${bg_factor}px`;
+    this.style.backgroundPosition = `${x_off}px ${y_off}px`;
+  }
+
   /**
    * Get the tile board position in the board matrix
    * @returns {Number[]} - row and column of tile
@@ -37,6 +46,7 @@ class Tile extends HTMLDivElement {
     const row = parseInt(this.style.gridRow) - 1;
     return [row, col];
   }
+
   /**
    * Get the tile number stored in its inner text
    * @returns {number} - tile number as an integer
@@ -44,17 +54,18 @@ class Tile extends HTMLDivElement {
   getTileNum() {
     return parseInt(this.innerText);
   }
+
   /**
    * Change the location of the tile in the grid and stop animation
    * @param {number} n_row - new row position of tile
    * @param {number} n_col - new column position of tile
    */
   updateBoardPos(n_row, n_col) {
-    // this.style.translate = "0px 0px";
     this.style.translate = "";
     this.style.gridRow = n_row + 1;
     this.style.gridColumn = n_col + 1;
   }
+
   /**
    * Activate the tile move animation then update the tile board position
    * @param {number} n_row - new row position of tile
@@ -64,9 +75,6 @@ class Tile extends HTMLDivElement {
     const [c_row, c_col] = this.getBoardPos();
     const diff_x = n_col - c_col - 1;
     const diff_y = n_row - c_row - 1;
-    // const diff_x = n_col - c_col;
-    // const diff_y = n_row - c_row;
-    // this.style.translate = "50px 50px";
     this.style.translate = `${diff_x * 100}px ${diff_y * 100}px`;
     setTimeout(() => {
       this.updateBoardPos(n_row, n_col);
@@ -106,6 +114,7 @@ class Board {
     this.board_wrapper.lastChild.remove();
     this.board[size - 1][size - 1] = null;
   }
+
   /**
    * Iterates over tiles in the board
    * @generator
@@ -119,6 +128,7 @@ class Board {
       }
     }
   }
+
   /**
    *  Swap location of empty tile and tile clicked by user
    *  by shifting column/row of tiles between them towards
@@ -135,6 +145,7 @@ class Board {
       this.moveEmptyV(t_row, e_row, e_col);
     }
   }
+
   /**
    * Add and remove hover style from tiles based on location of
    * empty tile
@@ -161,6 +172,7 @@ class Board {
       }
     }
   }
+
   /**
    * Move a group of tiles horizontally
    * @param {number} num - new column location for empty tile
@@ -177,6 +189,7 @@ class Board {
       this.emptyTile[1] += direction;
     }
   }
+
   /**
    * Move a group of tiles vertically
    * @param {number} num - new row location for empty tile
@@ -193,27 +206,34 @@ class Board {
       this.emptyTile[0] += direction;
     }
   }
+
   /**
-   * Update tile positions for all tiles on the board
-   * to match with backend representation
+   * Update tile backgrounds based on originial positions
+   * @param {string} image - new background image
    */
-  updateEntireBoard() {
-    for (let i = 0; i < this.size; i++) {
-      for (let j = 0; j < this.size; j++) {
-        if (this.board[i][j] === null) {
-          continue;
-        }
-        this.board[i][j].updateBoardPos(i, j);
+  changeBackgroundImage(image) {
+    this.image = image;
+    let count = this.size * this.size - 1;
+    for (const [_, __, tile] of this.tileIter()) {
+      tile.updateBackground(image);
+      count--;
+      if (count === 0) {
+        break;
       }
     }
   }
+
   /**
    * Shuffles game board internal representation and
    * updates frontend representation
    */
   shuffle() {
     let [e_row, e_col] = this.emptyTile;
-    for (let i = 0; i < (this.size - 1) * 100; i++) {
+    for (
+      let i = Math.round(Math.random());
+      i < Math.pow(this.size, 2) * 10;
+      i++
+    ) {
       // move to space 1,2,3,...,size-1 of row or column
       // from left to right or top to bottom(dont allow no movement)
       let square = Math.floor(Math.random() * (this.size - 1));
@@ -235,6 +255,26 @@ class Board {
     }
     this.updateHoverStyles();
   }
+
+  /**
+   * Reset board back to original state visually and
+   * internally
+   */
+  reset() {
+    const new_board = Array.from(Array(this.size), () => Array(this.size));
+    for (const [__, _, tile] of this.tileIter()) {
+      if (tile === null) {
+        continue;
+      }
+
+      tile.translateUpdate(tile.row, tile.col);
+      new_board[tile.row][tile.col] = tile;
+    }
+    new_board[this.size - 1][this.size - 1] = null;
+    this.emptyTile = [this.size - 1, this.size - 1];
+    this.board = new_board;
+  }
+
   /**
    * Checks if game board is solved
    * @returns {boolean} - true if board is solved
@@ -252,8 +292,6 @@ class Board {
     }
     return true;
   }
-  // solve the board for the player
-  solve() {}
 }
 
 // manages starting/ending game
@@ -262,53 +300,90 @@ class GameLogic {
    * Construct game logic class to manage game session
    * @constructor
    */
-  // initializes all instance variables
   constructor() {
     // get from player inputs or set a default
     this.board_wrapper = document.getElementsByClassName("game-board")[0];
+
+    this.shuffle_button = document.getElementById("shuffle-button");
+    this.reset_button = document.getElementById("reset-button");
+
     this.size = 3;
 
-    this.image = "./assets/1.png";
+    const randomImgNum = Math.floor(Math.random() * 4);
+
+    this.image = `./assets/${randomImgNum}.png`;
+
     this.game = new Board(this.size, this.image, this.board_wrapper);
     this.click_handle_ref = false;
-    this.click_handled = false;
 
+    this.boardSizeInput = document.getElementById("board_size");
+    this.boardImageInput = document.getElementById("board_img_btn");
+
+    this.handleBoardImageInput();
+    this.handleBoardSizeInput();
+  }
+
+  /**
+   * sets up event handling for the board size input element.
+   * When the input value changes, it updates the board size and displays it
+   * @function
+   * @memberof Gamelogic
+   */
+  handleBoardSizeInput() {
     const boardSizeInput = document.getElementById("board_size");
     const boardSizeValueElement = document.getElementById("board_size_value");
+
+    document.addEventListener("DOMContentLoaded", () => {
+      boardSizeInput.value = 3;
+    });
 
     boardSizeInput.addEventListener("input", () => {
       const newSize = parseInt(boardSizeInput.value);
       boardSizeValueElement.textContent = `${newSize}x${newSize}`;
-      game_session.changeBoardSize(newSize);
+      this.changeBoardSize(newSize);
     });
+  }
 
-    const boardImageInput = document.getElementById("board_img");
+  /**sets up event handling for the board image input button.
+   * When the button is clicked, it cycles through different images for the board background.
+   * @function
+   * @memberof Gamelogic
+   */
+  handleBoardImageInput() {
+    const boardImageInput = document.getElementById("board_img_btn");
     let prev = 1;
     boardImageInput.addEventListener("click", () => {
       prev++;
       prev %= 4;
 
-      game_session.changeBoardImage(`./assets/${prev}.png`);
+      this.changeBoardImage(`./assets/${prev}.png`);
+
     });
   }
 
+  /**
+   * Changes the image of the board and updates the game accordingly.
+   * @param {string} newImg - The URL or path to the new image for the board.
+   */
   changeBoardImage(newImg) {
     if (this.image !== newImg) {
+      this.game.changeBackgroundImage(newImg);
       this.image = newImg;
-      this.removeClickHandle();
+    }
+  }
+
+  /**
+   * Changes the size of the board and updates the game accordingly.
+   * @param {number} newSize - The new size for the board. It represents the number of rows and columns.
+   */
+  changeBoardSize(newSize) {
+    if (this.size !== newSize) {
+      this.size = newSize;
       this.board_wrapper.innerHTML = "";
       this.game = new Board(this.size, this.image, this.board_wrapper);
     }
   }
 
-  changeBoardSize(newSize) {
-    if (this.size !== newSize) {
-      this.size = newSize;
-      this.removeClickHandle();
-      this.board_wrapper.innerHTML = "";
-      this.game = new Board(this.size, this.image, this.board_wrapper);
-    }
-  }
   /**
    * Add click handling for tiles
    */
@@ -321,6 +396,7 @@ class GameLogic {
     };
     this.board_wrapper.addEventListener("click", this.click_handle_ref);
   }
+
   /**
    * Remove click handling for tiles
    */
@@ -331,6 +407,7 @@ class GameLogic {
     this.board_wrapper.removeEventListener("click", this.click_handle_ref);
     this.click_handle_ref = false;
   }
+
   /**
    * Handles clicks on tiles. Finds closest tile clicked
    * and attempts to move tile. Check if game is over after
@@ -349,34 +426,89 @@ class GameLogic {
       this.endGame();
     }
   }
+
+  /**
+   * Invert state of reset and shuffle buttons
+   */
+  invertButtons() {
+    this.shuffle_button.disabled = !this.shuffle_button.disabled;
+    this.reset_button.disabled = !this.reset_button.disabled;
+  }
+
   /**
    * Initialize a new game board and add click handling
    * and shuffle board until shuffled
    */
   initGame() {
     this.addClickHandle();
+    this.invertButtons();
+    this.boardImageInput.disabled = true;
+    this.boardSizeInput.disabled = true;
+
+    this.boardImageInput.classList.add("after_shuffle");
+
     while (this.game.isSolved()) {
       this.game.shuffle();
     }
   }
+
+  /**
+   * Reset the game board to solved state
+   */
+  resetGame() {
+    this.boardSizeInput.disabled = false;
+    this.boardImageInput.disabled = false;
+    this.boardImageInput.classList.remove("after_shuffle");
+    this.boardImageInput.classList.add("before_shuffle");
+    this.removeClickHandle();
+    this.game.updateHoverStyles(true);
+    // this.game.reset();
+    this.invertButtons();
+  }
+
   /**
    * Display splash and remove click handling for board
    */
   endGame() {
     const congratsModal = document.getElementById("modal");
     congratsModal.style.display = "block";
-    congratsModal.addEventListener("click", () => {
-      congratsModal.style.display = "none";
-      this.removeClickHandle();
-      this.game.updateHoverStyles(true);
-    });
-
-    const playAgain = document.getElementById("playAgainBtn");
-    playAgain.addEventListener("click", () => {
-      congratsModal.style.display = "none";
-      game_session.initGame();
-    });
   }
 }
 
 const game_session = new GameLogic();
+
+const instructions = document.getElementById("instructions");
+const instructionsOk = document.getElementById("instructions_ok");
+instructions.addEventListener("click", () => {
+  const instructionsPopUp = document.getElementById("instructions_popup");
+  instructionsPopUp.style.display = "block";
+});
+
+instructionsOk.addEventListener("click", () => {
+  const instructionsPopUp = document.getElementById("instructions_popup");
+  instructionsPopUp.style.display = "none";
+});
+
+const shuffle_button = document.getElementById("shuffle-button");
+shuffle_button.setAttribute("onclick", "game_session.initGame();");
+shuffle_button.disabled = false;
+
+const reset_button = document.getElementById("reset-button");
+reset_button.setAttribute(
+  "onclick",
+  "game_session.resetGame(); game_session.game.reset()"
+);
+reset_button.disabled = true;
+
+const congratsModal = document.getElementById("modal");
+
+congratsModal.addEventListener("click", () => {
+  congratsModal.style.display = "none";
+  game_session.resetGame();
+});
+
+const playAgain = document.getElementById("playAgainBtn");
+playAgain.addEventListener("click", () => {
+  congratsModal.style.display = "none";
+  game_session.initGame();
+});
