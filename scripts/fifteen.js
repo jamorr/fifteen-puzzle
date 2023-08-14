@@ -66,7 +66,7 @@ class Tile extends HTMLDivElement {
    * @returns {number} - tile number as an integer
    */
   getTileNum() {
-    return parseInt(this.innerText);
+    return parseInt(this.textContent);
   }
 
   /**
@@ -125,8 +125,8 @@ class Board {
     }
 
     this.empty_tile = [size - 1, size - 1]; // store location of empty tile
-    this.board_wrapper.lastChild.remove();
-    this.board[size - 1][size - 1] = null;
+    this.board_wrapper.lastChild.style.visibility = "hidden";
+    //this.board[size - 1][size - 1] = null;
   }
 
   /**
@@ -174,7 +174,7 @@ class Board {
       [e_row, e_col] = this.empty_tile;
     }
     for (const [i, j, tile] of this.tileIter()) {
-      if (tile === null) {
+      if (tile.style.visibility === "hidden") {
         continue;
       }
       if (i === e_row || j === e_col) {
@@ -195,11 +195,14 @@ class Board {
     const r = row;
     const direction = num < col ? -1 : 1;
     for (let c = col; c !== num; c += direction) {
+      const temp = this.board[r][c];
       this.board[r][c + direction].translateUpdate(r, c);
       this.board[r][c] = this.board[r][c + direction];
-      this.board[r][c + direction] = null;
+      this.board[r][c + direction] = temp;
       this.empty_tile[1] += direction;
     }
+    const [e_row, e_col] = this.empty_tile;
+    this.board[e_row][e_col].updateBoardPos(e_row, e_col);
   }
 
   /**
@@ -212,11 +215,14 @@ class Board {
     const c = col;
     const direction = num < row ? -1 : 1;
     for (let r = row; r !== num; r += direction) {
+      const temp = this.board[r][c];
       this.board[r + direction][c].translateUpdate(r, c);
       this.board[r][c] = this.board[r + direction][c];
-      this.board[r + direction][c] = null;
+      this.board[r + direction][c] = temp;
       this.empty_tile[0] += direction;
     }
+    const [e_row, e_col] = this.empty_tile;
+    this.board[e_row][e_col].updateBoardPos(e_row, e_col);
   }
 
   /**
@@ -272,13 +278,9 @@ class Board {
     this.updateHoverStyles();
     this.shuffled_state = new Map();
     for (const [i, j, tile] of this.tileIter()) {
-      if (tile == null) {
-        continue;
-      }
       this.shuffled_state.set(tile.getTileNum(), [i, j]);
     }
 
-    console.log(this.shuffled_state);
     // get rid of last move
   }
 
@@ -289,14 +291,9 @@ class Board {
   reset() {
     const new_board = Array.from(Array(this.size), () => Array(this.size));
     for (const [__, _, tile] of this.tileIter()) {
-      if (tile === null) {
-        continue;
-      }
-
       tile.translateUpdate(tile.row, tile.col);
       new_board[tile.row][tile.col] = tile;
     }
-    new_board[this.size - 1][this.size - 1] = null;
     this.empty_tile = [this.size - 1, this.size - 1];
     this.board = new_board;
   }
@@ -306,13 +303,15 @@ class Board {
    * @returns {boolean} - true if board is solved
    */
   isSolved() {
-    if (this.board[this.size - 1][this.size - 1] !== null) {
+    if (
+      this.board[this.size - 1][this.size - 1].style.visibility !== "hidden"
+    ) {
       return false;
     }
     let prev = 0;
     for (const [_, __, tile] of this.tileIter()) {
       prev++;
-      if (tile !== null && prev !== tile.getTileNum()) {
+      if (prev !== tile.getTileNum()) {
         return false;
       }
     }
@@ -328,17 +327,12 @@ class Board {
     for (let i = 0; i < this.board.length; i++) {
       const row = this.board[i];
       for (let j = 0; j < row.length; j++) {
-        while (this.board[i][j] != null) {
+        while (true) {
           const tile = this.board[i][j];
           const [new_r, new_c] = this.shuffled_state.get(tile.getTileNum());
           const temp = this.board[i][j];
           this.board[i][j] = this.board[new_r][new_c];
           this.board[new_r][new_c] = temp;
-          this.board[new_r][new_c].translateUpdate(new_r, new_c);
-          if (this.board[i][j] == null) {
-            continue;
-          }
-          this.board[i][j].translateUpdate(i, j);
           const [next_r, next_c] = this.shuffled_state.get(
             this.board[i][j].getTileNum()
           );
@@ -348,10 +342,14 @@ class Board {
         }
       }
     }
+    for (const [i, j, tile] of this.tileIter()) {
+      tile.translateUpdate(i, j);
+    }
+    this.empty_tile = this.shuffled_state.get(this.size * this.size);
 
     setTimeout(() => {
       this.cheat_id = setInterval(() => this.showCheatSol(), 200);
-    }, 300);
+    }, 800);
   }
   showCheatSol() {
     if (this.shuffle_stack.length > 0) {
@@ -493,7 +491,7 @@ class GameLogic {
    */
   clickHandler(event) {
     const element = event.target.closest(".tile");
-    if (element === null) {
+    if (element.style.visibility === "hidden") {
       return;
     }
     this.game.moveTiles(element);
@@ -601,6 +599,7 @@ reset_button.disabled = true;
 
 const cheat_button = document.getElementById("cheat-button");
 cheat_button.setAttribute("onclick", "game_session.solve()");
+cheat_button.disabled = true;
 const congrats_modal = document.getElementById("modal");
 
 congrats_modal.addEventListener("click", () => {
