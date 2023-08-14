@@ -267,10 +267,19 @@ class Board {
       }
       this.shuffle_stack.push([e_row, e_col]);
     }
-    this.shuffled_state = this.board;
-    // get rid of last move
+
     this.shuffle_stack.pop();
     this.updateHoverStyles();
+    this.shuffled_state = new Map();
+    for (const [i, j, tile] of this.tileIter()) {
+      if (tile == null) {
+        continue;
+      }
+      this.shuffled_state.set(tile.getTileNum(), [i, j]);
+    }
+
+    console.log(this.shuffled_state);
+    // get rid of last move
   }
 
   /**
@@ -316,8 +325,33 @@ class Board {
     if (this.shuffled_state === undefined) {
       return;
     }
-    this.board = this.shuffled_state;
-    this.cheat_id = setInterval(() => this.showCheatSol(), 200);
+    for (let i = 0; i < this.board.length; i++) {
+      const row = this.board[i];
+      for (let j = 0; j < row.length; j++) {
+        while (this.board[i][j] != null) {
+          const tile = this.board[i][j];
+          const [new_r, new_c] = this.shuffled_state.get(tile.getTileNum());
+          const temp = this.board[i][j];
+          this.board[i][j] = this.board[new_r][new_c];
+          this.board[new_r][new_c] = temp;
+          this.board[new_r][new_c].translateUpdate(new_r, new_c);
+          if (this.board[i][j] == null) {
+            continue;
+          }
+          this.board[i][j].translateUpdate(i, j);
+          const [next_r, next_c] = this.shuffled_state.get(
+            this.board[i][j].getTileNum()
+          );
+          if (next_r === i && next_c === j) {
+            break;
+          }
+        }
+      }
+    }
+
+    setTimeout(() => {
+      this.cheat_id = setInterval(() => this.showCheatSol(), 200);
+    }, 300);
   }
   showCheatSol() {
     if (this.shuffle_stack.length > 0) {
@@ -345,11 +379,12 @@ class GameLogic {
 
     this.shuffle_button = document.getElementById("shuffle-button");
     this.reset_button = document.getElementById("reset-button");
+    this.cheat_button = document.getElementById("cheat-button");
 
     this.board_size_input = document.getElementById("board_size");
     this.board_image_input = document.getElementById("board_img_btn");
 
-    this.size = 3;
+    this.size = 4;
 
     const random_img_num = Math.floor(Math.random() * 4);
 
@@ -468,6 +503,25 @@ class GameLogic {
       this.endGame();
     }
   }
+  /**
+   * Solves the original shuffle of the boards and
+   * resets game state so that the player is not credited
+   * for a win
+   */
+  solve() {
+    this.removeClickHandle();
+
+    //remove hover animation
+    this.game.updateHoverStyles(true);
+    this.cheat_button.disabled = true;
+    this.reset_button.disabled = true;
+    setTimeout(() => {
+      this.cheat_button.disabled = false;
+      this.reset_button.disabled = false;
+      this.invertButtons();
+    }, 200 * (this.game.shuffle_stack.length + 3));
+    this.game.cheat();
+  }
 
   /**
    * Invert state of change image, size slider, reset and shuffle buttons
@@ -475,6 +529,7 @@ class GameLogic {
   invertButtons() {
     this.shuffle_button.disabled = !this.shuffle_button.disabled;
     this.reset_button.disabled = !this.reset_button.disabled;
+    this.cheat_button.disabled = !this.cheat_button.disabled;
     this.board_size_input.disabled = !this.board_size_input.disabled;
     this.board_image_input.disabled = !this.board_image_input.disabled;
     if (this.board_image_input.classList.contains("before_shuffle")) {
@@ -544,6 +599,8 @@ const reset_button = document.getElementById("reset-button");
 reset_button.setAttribute("onclick", "game_session.resetGame();");
 reset_button.disabled = true;
 
+const cheat_button = document.getElementById("cheat-button");
+cheat_button.setAttribute("onclick", "game_session.solve()");
 const congrats_modal = document.getElementById("modal");
 
 congrats_modal.addEventListener("click", () => {
@@ -556,5 +613,5 @@ play_again.addEventListener("click", () => {
   game_session.initGame();
 });
 
-game_session.initGame();
-game_session.game.cheat();
+//<!-- game_session.initGame(); -->
+//game_session.game.cheat();
